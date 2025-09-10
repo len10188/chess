@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
     }
@@ -55,8 +56,23 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         if (piece.getPieceType() == PieceType.BISHOP){
-            return List.of(new ChessMove(new ChessPosition(5,4), new ChessPosition(1,8), null));
+            
+            List<ChessMove> moves = new ArrayList<>();
+
+            ChessPosition testPosition = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() + 1));
+            if (testPosition.getRow() <= 8 && testPosition.getColumn() <= 8) {
+                moves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()), testPosition,null   ));
+            }
+
+            moves.add(new ChessMove(new ChessPosition((myPosition.getRow(), myPosition.getColumn()), new ChessPosition(0,0), null));
+
         }
         return List.of();
+    }
+    public boolean checkValidPosition(ChessPosition currentPosition){
+        return currentPosition.getRow() <= 8 &&
+                currentPosition.getColumn() <= 8 &&
+                currentPosition.getRow() >= 1 &&
+                currentPosition.getColumn() >= 1;
     }
 }
