@@ -55,24 +55,37 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
+
+        List<ChessMove> moves = new ArrayList<>();
+
         if (piece.getPieceType() == PieceType.BISHOP){
-            
-            List<ChessMove> moves = new ArrayList<>();
 
-            ChessPosition testPosition = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() + 1));
-            if (testPosition.getRow() <= 8 && testPosition.getColumn() <= 8) {
-                moves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()), testPosition,null   ));
-            }
-
-            moves.add(new ChessMove(new ChessPosition((myPosition.getRow(), myPosition.getColumn()), new ChessPosition(0,0), null));
-
+            // Add all possible diagonals to move list
+            MoveInDirection(moves, myPosition, 1, 1);
+            MoveInDirection(moves, myPosition, -1,1);
+            MoveInDirection(moves, myPosition, -1, -1);
+            MoveInDirection(moves, myPosition, 1,-1);
         }
-        return List.of();
+        return moves;
     }
+    // Check if position is valid on the board
     public boolean checkValidPosition(ChessPosition currentPosition){
         return currentPosition.getRow() <= 8 &&
                 currentPosition.getColumn() <= 8 &&
                 currentPosition.getRow() >= 1 &&
                 currentPosition.getColumn() >= 1;
+    }
+    //move in a direction.
+    private void MoveInDirection(List<ChessMove> moves, ChessPosition startPos, int rowDir, int colDir){
+        int row = startPos.getRow() +rowDir;
+        int col = startPos.getColumn() + colDir;
+
+        while (checkValidPosition(new ChessPosition(row,col))){
+            ChessPosition testPosition = new ChessPosition(row, col);
+            moves.add(new ChessMove(startPos, testPosition, null));
+
+            row += rowDir;
+            col += colDir;
+        }
     }
 }
