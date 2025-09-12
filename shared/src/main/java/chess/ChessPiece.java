@@ -71,6 +71,12 @@ public class ChessPiece {
     }
     // Check if position is valid on the board
     public boolean checkValidPosition(ChessPosition currentPosition){
+        // Check if move on board.
+        //if (currentPosition.getRow() <= 8 &&
+        //currentPosition.getColumn() <= 8 &&
+        //        currentPosition.getRow() >= 1 &&
+         //       currentPosition.getColumn() >= 1){
+        //}
         return currentPosition.getRow() <= 8 &&
                 currentPosition.getColumn() <= 8 &&
                 currentPosition.getRow() >= 1 &&
