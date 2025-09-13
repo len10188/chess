@@ -62,64 +62,64 @@ public class ChessPiece {
 
         if (piece.getPieceType() == PieceType.BISHOP){
             // Add all possible diagonals to move list
-            MoveInDirection(moves, myPosition, 1, 1, board, myColor); // up-right
-            MoveInDirection(moves, myPosition, -1,1, board, myColor); // down-right
-            MoveInDirection(moves, myPosition, -1, -1, board, myColor); // down-left
-            MoveInDirection(moves, myPosition, 1,-1, board, myColor); // up-left
+            moveInDirection(moves, myPosition, 1, 1, board, myColor); // up-right
+            moveInDirection(moves, myPosition, -1,1, board, myColor); // down-right
+            moveInDirection(moves, myPosition, -1, -1, board, myColor); // down-left
+            moveInDirection(moves, myPosition, 1,-1, board, myColor); // up-left
         }
         if (piece.getPieceType() == PieceType.ROOK){
-            MoveInDirection(moves, myPosition,1, 0, board, myColor); // up
-            MoveInDirection(moves, myPosition, -1, 0, board, myColor); // down
-            MoveInDirection(moves, myPosition, 0, 1, board, myColor); // right
-            MoveInDirection(moves, myPosition, 0, -1, board, myColor); // left
+            moveInDirection(moves, myPosition,1, 0, board, myColor); // up
+            moveInDirection(moves, myPosition, -1, 0, board, myColor); // down
+            moveInDirection(moves, myPosition, 0, 1, board, myColor); // right
+            moveInDirection(moves, myPosition, 0, -1, board, myColor); // left
         }
         if (piece.getPieceType() == PieceType.KNIGHT){
-            MoveSinglePos(moves, myPosition, 2, 1, board, myColor);
-            MoveSinglePos(moves, myPosition, -2, 1, board, myColor);
-            MoveSinglePos(moves, myPosition, 2, -1, board, myColor);
-            MoveSinglePos(moves, myPosition, -2, -1, board, myColor);
-            MoveSinglePos(moves, myPosition, 1, 2, board, myColor);
-            MoveSinglePos(moves, myPosition, -1, 2, board, myColor);
-            MoveSinglePos(moves, myPosition, 1, -2, board, myColor);
-            MoveSinglePos(moves, myPosition, -1, -2, board, myColor);
+            moveSinglePos(moves, myPosition, 2, 1, board, myColor);
+            moveSinglePos(moves, myPosition, -2, 1, board, myColor);
+            moveSinglePos(moves, myPosition, 2, -1, board, myColor);
+            moveSinglePos(moves, myPosition, -2, -1, board, myColor);
+            moveSinglePos(moves, myPosition, 1, 2, board, myColor);
+            moveSinglePos(moves, myPosition, -1, 2, board, myColor);
+            moveSinglePos(moves, myPosition, 1, -2, board, myColor);
+            moveSinglePos(moves, myPosition, -1, -2, board, myColor);
         }
         if (piece.getPieceType() == PieceType.KING) {
-            MoveSinglePos(moves, myPosition, 1, -1, board, myColor);
-            MoveSinglePos(moves, myPosition, 1, 0, board, myColor);
-            MoveSinglePos(moves, myPosition, 1, 1, board, myColor);
-            MoveSinglePos(moves, myPosition, 0, -1, board, myColor);
-            MoveSinglePos(moves, myPosition, 0,1, board, myColor);
-            MoveSinglePos(moves, myPosition, -1, -1, board, myColor);
-            MoveSinglePos(moves, myPosition, -1, 0, board, myColor);
-            MoveSinglePos(moves, myPosition, -1, 1, board, myColor);
+            moveSinglePos(moves, myPosition, 1, -1, board, myColor);
+            moveSinglePos(moves, myPosition, 1, 0, board, myColor);
+            moveSinglePos(moves, myPosition, 1, 1, board, myColor);
+            moveSinglePos(moves, myPosition, 0, -1, board, myColor);
+            moveSinglePos(moves, myPosition, 0,1, board, myColor);
+            moveSinglePos(moves, myPosition, -1, -1, board, myColor);
+            moveSinglePos(moves, myPosition, -1, 0, board, myColor);
+            moveSinglePos(moves, myPosition, -1, 1, board, myColor);
         }
         if (piece.getPieceType() == PieceType.QUEEN) {
             // Diagonal
-            MoveInDirection(moves, myPosition, 1, 1, board, myColor); // up-right
-            MoveInDirection(moves, myPosition, -1,1, board, myColor); // down-right
-            MoveInDirection(moves, myPosition, -1, -1, board, myColor); // down-left
-            MoveInDirection(moves, myPosition, 1,-1, board, myColor); // up-left
+            moveInDirection(moves, myPosition, 1, 1, board, myColor); // up-right
+            moveInDirection(moves, myPosition, -1,1, board, myColor); // down-right
+            moveInDirection(moves, myPosition, -1, -1, board, myColor); // down-left
+            moveInDirection(moves, myPosition, 1,-1, board, myColor); // up-left
             // Straight
-            MoveInDirection(moves, myPosition,1, 0, board, myColor); // up
-            MoveInDirection(moves, myPosition, -1, 0, board, myColor); // down
-            MoveInDirection(moves, myPosition, 0, 1, board, myColor); // right
-            MoveInDirection(moves, myPosition, 0, -1, board, myColor); // left
+            moveInDirection(moves, myPosition,1, 0, board, myColor); // up
+            moveInDirection(moves, myPosition, -1, 0, board, myColor); // down
+            moveInDirection(moves, myPosition, 0, 1, board, myColor); // right
+            moveInDirection(moves, myPosition, 0, -1, board, myColor); // left
         }
         if (piece.getPieceType() == PieceType.PAWN){
             int rowDir;
-            ChessPosition PawnFirstMove;
+            ChessPosition pawnStartMove;
             if (myColor == ChessGame.TeamColor.WHITE){
                 rowDir = 1; // move up
                 if (myPosition.getRow() == 2){
-                    PawnFirstMove = new ChessPosition(myPosition.getRow()+2, myPosition.getColumn());
-                    pawnFirstMove(moves, myPosition, PawnFirstMove, board, myColor);
+                    pawnStartMove = new ChessPosition(myPosition.getRow()+2, myPosition.getColumn());
+                    pawnFirstMove(moves, myPosition, pawnStartMove, board, myColor);
                 }
 
             } else {
                 rowDir = -1; // move down
                 if (myPosition.getRow() == 7){
-                    PawnFirstMove = new ChessPosition(myPosition.getRow()-2 , myPosition.getColumn());
-                    pawnFirstMove(moves, myPosition, PawnFirstMove, board, myColor);
+                    pawnStartMove = new ChessPosition(myPosition.getRow()-2 , myPosition.getColumn());
+                    pawnFirstMove(moves, myPosition, pawnStartMove, board, myColor);
                 }
             }
             // try forward
@@ -129,7 +129,9 @@ public class ChessPiece {
         }
         return moves;
     }
-    private void pawnFirstMove(List<ChessMove> moves,ChessPosition startPos, ChessPosition testPosition, ChessBoard board, ChessGame.TeamColor myColor){
+    private void pawnFirstMove(List<ChessMove> moves,ChessPosition startPos,
+                               ChessPosition testPosition, ChessBoard board,
+                               ChessGame.TeamColor myColor){
         if (checkValidPosition(testPosition)){
             ChessPiece pieceTwoAhead = board.getPiece(testPosition);
             ChessPiece pieceOneAhead;
@@ -158,7 +160,9 @@ public class ChessPiece {
         }
     }
     // pawn capture
-    private void addPawnCaptureIfValid(List<ChessMove> moves, ChessPosition startPos, ChessPosition testPosition, ChessBoard board,  ChessGame.TeamColor myColor){
+    private void addPawnCaptureIfValid(List<ChessMove> moves, ChessPosition startPos,
+                                       ChessPosition testPosition, ChessBoard board,
+                                       ChessGame.TeamColor myColor){
         if (checkValidPosition(testPosition)){
             ChessPiece pieceAt = board.getPiece(testPosition);
             if (pieceAt != null && myColor != pieceAt.pieceColor){ // yes there is a piece and it is opponent
@@ -177,7 +181,8 @@ public class ChessPiece {
         moves.add(new ChessMove(startPos, testPosition, PieceType.ROOK));
         moves.add(new ChessMove(startPos, testPosition, PieceType.KNIGHT));
     }
-    public void pawnCaptureMove(List<ChessMove> moves, ChessPosition startPos, ChessBoard board, int rowDir, ChessGame.TeamColor myColor){
+    public void pawnCaptureMove(List<ChessMove> moves, ChessPosition startPos,
+                                ChessBoard board, int rowDir, ChessGame.TeamColor myColor){
         // left diagonal
         ChessPosition leftDiag = new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn()-1);
         addPawnCaptureIfValid(moves, startPos, leftDiag, board, myColor);
@@ -195,7 +200,8 @@ public class ChessPiece {
                 currentPosition.getColumn() >= 1;
     }
     //move in a direction.
-    private void MoveInDirection(List<ChessMove> moves, ChessPosition startPos, int rowDir, int colDir, ChessBoard board, ChessGame.TeamColor myColor){
+    private void moveInDirection(List<ChessMove> moves, ChessPosition startPos,
+                                 int rowDir, int colDir, ChessBoard board, ChessGame.TeamColor myColor){
         int row = startPos.getRow() +rowDir;
         int col = startPos.getColumn() + colDir;
 
@@ -218,7 +224,8 @@ public class ChessPiece {
         col += colDir;
         }
     }
-    private void MoveSinglePos (List<ChessMove> moves, ChessPosition startPos, int rowDir, int colDir, ChessBoard board, ChessGame.TeamColor myColor){
+    private void moveSinglePos (List<ChessMove> moves, ChessPosition startPos, int rowDir, int colDir,
+                                ChessBoard board, ChessGame.TeamColor myColor){
         ChessPosition testPosition = new ChessPosition(startPos.getRow()+rowDir, startPos.getColumn()+colDir);
 
         if (checkValidPosition(testPosition)){
