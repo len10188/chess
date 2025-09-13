@@ -106,17 +106,86 @@ public class ChessPiece {
             MoveInDirection(moves, myPosition, 0, -1, board, myColor); // left
         }
         if (piece.getPieceType() == PieceType.PAWN){
-            int colDir;
+            int rowDir;
+            ChessPosition PawnFirstMove;
             if (myColor == ChessGame.TeamColor.WHITE){
-                colDir = 1; // move up
+                rowDir = 1; // move up
                 if (myPosition.getRow() == 2){
+                    PawnFirstMove = new ChessPosition(myPosition.getRow()+2, myPosition.getColumn());
+                    pawnFirstMove(moves, myPosition, PawnFirstMove, board, myColor);
+                }
 
+            } else {
+                rowDir = -1; // move down
+                if (myPosition.getRow() == 7){
+                    PawnFirstMove = new ChessPosition(myPosition.getRow()-2 , myPosition.getColumn());
+                    pawnFirstMove(moves, myPosition, PawnFirstMove, board, myColor);
                 }
             }
+            // try forward
+            pawnMoveStraight(moves, myPosition, board, rowDir);
+            // try diagonals
+            pawnCaptureMove(moves, myPosition, board, rowDir, myColor);
         }
         return moves;
     }
-    public void pawnMoves(List<ChessMove> moves, ChessPosition startPos
+    private void pawnFirstMove(List<ChessMove> moves,ChessPosition startPos, ChessPosition testPosition, ChessBoard board, ChessGame.TeamColor myColor){
+        if (checkValidPosition(testPosition)){
+            ChessPiece pieceTwoAhead = board.getPiece(testPosition);
+            ChessPiece pieceOneAhead;
+            if(myColor == ChessGame.TeamColor.WHITE) {
+                pieceOneAhead = board.getPiece(new ChessPosition(testPosition.getRow() - 1, testPosition.getColumn()));
+            } else { // black
+                pieceOneAhead = board.getPiece(new ChessPosition(testPosition.getRow() + 1, testPosition.getColumn()));
+            }
+            if (pieceOneAhead == null && pieceTwoAhead == null) {
+                moves.add(new ChessMove(startPos, testPosition, null));
+            }
+        }
+    }
+    // pawn moving straight logic
+    public void pawnMoveStraight(List<ChessMove> moves, ChessPosition startPos, ChessBoard board, int rowDir){
+        ChessPosition testPosition = new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn());
+        if (checkValidPosition(testPosition)){
+            ChessPiece pieceAt = board.getPiece(testPosition);
+            if (pieceAt == null) { // only move if empty
+                if (testPosition.getRow() == 8 || testPosition.getRow() == 1){ // reached back row promote to queen.
+                    promotePawn(moves, startPos, testPosition); // Promote pawn.
+                } else {
+                    moves.add(new ChessMove(startPos, testPosition, null));
+                }
+            }
+        }
+    }
+    // pawn capture
+    private void addPawnCaptureIfValid(List<ChessMove> moves, ChessPosition startPos, ChessPosition testPosition, ChessBoard board,  ChessGame.TeamColor myColor){
+        if (checkValidPosition(testPosition)){
+            ChessPiece pieceAt = board.getPiece(testPosition);
+            if (pieceAt != null && myColor != pieceAt.pieceColor){ // yes there is a piece and it is opponent
+                if (testPosition.getRow() == 8 || testPosition.getRow() == 1){
+                    // reached back row promote pawn.
+                    promotePawn(moves, startPos, testPosition);
+                } else {
+                    moves.add(new ChessMove(startPos, testPosition, null));
+                }
+            }
+        }
+    }
+    private void promotePawn(List<ChessMove> moves, ChessPosition startPos, ChessPosition testPosition){
+        moves.add(new ChessMove(startPos, testPosition, PieceType.QUEEN));
+        moves.add(new ChessMove(startPos, testPosition, PieceType.BISHOP));
+        moves.add(new ChessMove(startPos, testPosition, PieceType.ROOK));
+        moves.add(new ChessMove(startPos, testPosition, PieceType.KNIGHT));
+    }
+    public void pawnCaptureMove(List<ChessMove> moves, ChessPosition startPos, ChessBoard board, int rowDir, ChessGame.TeamColor myColor){
+        // left diagonal
+        ChessPosition leftDiag = new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn()-1);
+        addPawnCaptureIfValid(moves, startPos, leftDiag, board, myColor);
+
+        // right diagonal
+        ChessPosition rightDiag = new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn() + 1);
+        addPawnCaptureIfValid(moves, startPos, rightDiag, board, myColor);
+    }
     // Check if position is valid on the board
     public boolean checkValidPosition(ChessPosition currentPosition){
         // Check if move on board.
@@ -139,7 +208,7 @@ public class ChessPiece {
             if (pieceAt == null) { // no piece blocking route
                 moves.add(new ChessMove(startPos, testPosition, null));
             } else { // if piece is opposite color add pos else break
-                if (checkCanCapture(pieceAt, board, myColor)) {
+                if (checkCanCapture(pieceAt, myColor)) {
                     moves.add(new ChessMove(startPos, testPosition, null));
                 }
                 break;
@@ -157,13 +226,13 @@ public class ChessPiece {
             if (pieceAt == null) {
                 moves.add(new ChessMove(startPos, testPosition, null));
             } else {
-                if(checkCanCapture(pieceAt, board, myColor)){
+                if(checkCanCapture(pieceAt, myColor)){
                     moves.add(new ChessMove(startPos, testPosition, null));
                 }
             }
         }
     }
-    private boolean checkCanCapture(ChessPiece testPiece, ChessBoard board, ChessGame.TeamColor myColor){
+    private boolean checkCanCapture(ChessPiece testPiece, ChessGame.TeamColor myColor){
         return testPiece.getTeamColor() != myColor; // returns true if can capture, false if same team.
     }
 
