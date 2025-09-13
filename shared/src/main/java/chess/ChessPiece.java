@@ -94,12 +94,12 @@ public class ChessPiece {
             MoveSinglePos(moves, myPosition, -1, 1, board, myColor);
         }
         if (piece.getPieceType() == PieceType.QUEEN) {
-            // Diagonals
+            // Diagonal
             MoveInDirection(moves, myPosition, 1, 1, board, myColor); // up-right
             MoveInDirection(moves, myPosition, -1,1, board, myColor); // down-right
             MoveInDirection(moves, myPosition, -1, -1, board, myColor); // down-left
             MoveInDirection(moves, myPosition, 1,-1, board, myColor); // up-left
-            // Straights
+            // Straight
             MoveInDirection(moves, myPosition,1, 0, board, myColor); // up
             MoveInDirection(moves, myPosition, -1, 0, board, myColor); // down
             MoveInDirection(moves, myPosition, 0, 1, board, myColor); // right
