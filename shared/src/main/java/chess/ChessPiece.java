@@ -106,10 +106,17 @@ public class ChessPiece {
             MoveInDirection(moves, myPosition, 0, -1, board, myColor); // left
         }
         if (piece.getPieceType() == PieceType.PAWN){
-            //cry.
+            int colDir;
+            if (myColor == ChessGame.TeamColor.WHITE){
+                colDir = 1; // move up
+                if (myPosition.getRow() == 2){
+
+                }
+            }
         }
         return moves;
     }
+    public void pawnMoves(List<ChessMove> moves, ChessPosition startPos
     // Check if position is valid on the board
     public boolean checkValidPosition(ChessPosition currentPosition){
         // Check if move on board.
