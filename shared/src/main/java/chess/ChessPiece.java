@@ -107,28 +107,30 @@ public class ChessPiece {
         }
         if (piece.getPieceType() == PieceType.PAWN){
             int rowDir;
-            ChessPosition pawnStartMove;
-            if (myColor == ChessGame.TeamColor.WHITE){
-                rowDir = 1; // move up
-                if (myPosition.getRow() == 2){
-                    pawnStartMove = new ChessPosition(myPosition.getRow()+2, myPosition.getColumn());
-                    pawnFirstMove(moves, myPosition, pawnStartMove, board, myColor);
-                }
 
-            } else {
-                rowDir = -1; // move down
-                if (myPosition.getRow() == 7){
-                    pawnStartMove = new ChessPosition(myPosition.getRow()-2 , myPosition.getColumn());
-                    pawnFirstMove(moves, myPosition, pawnStartMove, board, myColor);
-                }
+            // ROW DIRECTION based on color
+            if (myColor == ChessGame.TeamColor.WHITE) {
+                rowDir = 1; // white piece moves down board.
+            }else {
+                rowDir = -1; // black piece moves up board.
             }
-            // try forward
-            pawnMoveStraight(moves, myPosition, board, rowDir);
-            // try diagonals
-            pawnCaptureMove(moves, myPosition, board, rowDir, myColor);
+            // FIRST MOVE
+            if (myColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2){ // start position
+                pawnFistMove(moves, myPosition, rowDir, board);
+                pawnCaptureMove(moves, myPosition, board, myColor);
+            }
+            else if (myColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7){ // start position
+                pawnFistMove(moves, myPosition, rowDir, board);
+                pawnCaptureMove(moves, myPosition, board, myColor);
+            } else{
+                pawnMoveSingleForward(moves, myPosition, board, rowDir);
+                pawnCaptureMove(moves, myPosition, board, myColor);
+            }
         }
         return moves;
     }
+    /*
+
     private void pawnFirstMove(List<ChessMove> moves,ChessPosition startPos,
                                ChessPosition testPosition, ChessBoard board,
                                ChessGame.TeamColor myColor){
@@ -191,6 +193,70 @@ public class ChessPiece {
         ChessPosition rightDiag = new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn() + 1);
         addPawnCaptureIfValid(moves, startPos, rightDiag, board, myColor);
     }
+
+*/
+    private void AddPawnMoves(List<ChessMove> moves, ChessPosition startPos, ChessPosition testPosition){
+        if (testPosition.getRow() == 1 || testPosition.getRow() == 8) {
+            moves.add(new ChessMove(startPos, testPosition, PieceType.QUEEN));
+            moves.add(new ChessMove(startPos, testPosition, PieceType.BISHOP));
+            moves.add(new ChessMove(startPos, testPosition, PieceType.ROOK));
+            moves.add(new ChessMove(startPos, testPosition, PieceType.KNIGHT));
+        } else {
+            moves.add(new ChessMove(startPos, testPosition, null));
+        }
+    }
+
+    private void pawnMoveSingleForward(List<ChessMove> moves, ChessPosition startPos, ChessBoard board, int rowDir){
+        ChessPosition testPosition= new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn());
+
+        if(checkValidPosition(testPosition)){
+            ChessPiece pieceAt = board.getPiece(testPosition);
+            if (pieceAt == null) {
+                AddPawnMoves(moves, startPos, testPosition);
+            }
+        }
+    }
+
+    private void pawnCaptureMove(List<ChessMove> moves, ChessPosition startPos, ChessBoard board,  ChessGame.TeamColor myColor) {
+        int rowDir;
+
+        if (myColor == ChessGame.TeamColor.WHITE) {
+            rowDir = 1; // white piece moves down board.
+        } else {
+            rowDir = -1; // black piece moves up board.
+        }
+
+        ChessPosition leftDiag = new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn() - 1);
+        if (checkValidPosition(leftDiag)) {
+            addPawnCaptureMove(moves, startPos, leftDiag, board, myColor);
+        }
+        ChessPosition rightDiag = new ChessPosition(startPos.getRow() + rowDir, startPos.getColumn() + 1);
+        if (checkValidPosition(rightDiag)) {
+            addPawnCaptureMove(moves, startPos, rightDiag, board, myColor);
+        }
+    }
+
+    private void addPawnCaptureMove(List<ChessMove> moves, ChessPosition startPos, ChessPosition testPosition ,ChessBoard board,  ChessGame.TeamColor myColor){
+        ChessPiece pieceAt = board.getPiece(testPosition);
+        if (pieceAt != null && pieceAt.getTeamColor() != myColor){
+            AddPawnMoves(moves, startPos, testPosition);
+        }
+    }
+
+    private void pawnFistMove(List<ChessMove> moves, ChessPosition startPosition, int rowDir,  ChessBoard board){
+        ChessPosition oneForward = new ChessPosition(startPosition.getRow()+ rowDir, startPosition.getColumn());
+        ChessPosition twoForward = new ChessPosition(startPosition.getRow() + (rowDir*2), startPosition.getColumn());
+        ChessPiece pieceOneForward = board.getPiece(oneForward);
+        ChessPiece pieceTwoForward = board.getPiece(twoForward);
+
+        if (pieceOneForward == null){
+            moves.add (new ChessMove(startPosition, oneForward, null));
+            if (pieceTwoForward == null){
+                moves.add (new ChessMove(startPosition, twoForward, null));
+            }
+        }
+    }
+
     // Check if position is valid on the board
     public boolean checkValidPosition(ChessPosition currentPosition){
         // Check if move on board.
@@ -208,7 +274,7 @@ public class ChessPiece {
         //valid position & not blocked.
         while (checkValidPosition(new ChessPosition(row,col))){
             ChessPosition testPosition = new ChessPosition(row, col);
-            ChessPiece pieceAt = board.getPiece((testPosition));
+            ChessPiece pieceAt = board.getPiece(testPosition);
 
             // Check if route is blocked.
             if (pieceAt == null) { // no piece blocking route
