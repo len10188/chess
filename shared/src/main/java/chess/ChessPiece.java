@@ -242,7 +242,7 @@ public class ChessPiece {
         }
     }
     private boolean checkCanCapture(ChessPiece testPiece, ChessGame.TeamColor myColor){
-        return testPiece.getTeamColor() != myColor; // returns true if can capture, false if same team.
+        return testPiece.getTeamColor() != myColor; // returns true if it can capture, false if same team.
     }
 
     @Override
