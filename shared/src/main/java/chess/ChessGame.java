@@ -118,7 +118,9 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> enemyMoves = piece.pieceMoves(board, position);
                     //check every enemy piece's potential moves
-                    return (canAttackKing(enemyMoves, kingPosition));
+                    if(canAttackKing(enemyMoves, kingPosition)){
+                        return true;
+                    }
                 }
             }
         }
