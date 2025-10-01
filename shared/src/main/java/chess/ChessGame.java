@@ -118,15 +118,22 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> enemyMoves = piece.pieceMoves(board, position);
                     //check every enemy piece's potential moves
-                    for (ChessMove move : enemyMoves){
-                        if (move.getEndPosition().equals(kingPosition)){
-                            return true; // king can be attacked
-                        }
+                    if (canAttackKing(enemyMoves, kingPosition)) {
+                        return true; // king can be attacked
                     }
                 }
             }
         }
         return false; // king is safe
+    }
+
+    private static boolean canAttackKing(Collection<ChessMove> enemyMoves, ChessPosition kingPosition) {
+        for (ChessMove move : enemyMoves){
+            if (move.getEndPosition().equals(kingPosition)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
