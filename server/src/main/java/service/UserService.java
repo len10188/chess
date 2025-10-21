@@ -17,8 +17,7 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public RegisterResult register(RegisterRequest request)
-    {
+    public RegisterResult register(RegisterRequest request) throws BadRequestException, AlreadyTakenException {
         // check if request is missing information.
         if ((request.username() == null) || (request.password() == null) || (request.email() == null)){
             throw new BadRequestException();
