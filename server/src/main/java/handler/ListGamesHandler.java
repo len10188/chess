@@ -1,14 +1,13 @@
 package handler;
 
 import com.google.gson.Gson;
-import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import request.ListGamesRequest;
 import result.ListGamesResult;
 import service.ListGamesService;
 import service.ServiceException;
 
-import java.util.Map;
+import static handler.HandlerUtils.sendError;
 
 public class ListGamesHandler {
     private ListGamesService listGamesService;
@@ -40,10 +39,4 @@ public class ListGamesHandler {
         }
     };
 
-    private void sendError(Context ctx, int statusCode, String message){
-        var errorBody = Map.of("message", message);
-        ctx.status(statusCode);
-        ctx.contentType("application/json");
-        ctx.result(gson.toJson(errorBody));
-    }
 }

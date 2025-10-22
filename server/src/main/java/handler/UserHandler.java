@@ -4,11 +4,10 @@ import com.google.gson.Gson;
 import request.RegisterRequest;
 import result.RegisterResult;
 import service.UserService;
-import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import service.ServiceException;
 
-import java.util.Map;
+import static handler.HandlerUtils.sendError;
 
 public class UserHandler {
     private UserService userService;
@@ -33,17 +32,11 @@ public class UserHandler {
 
             // handler errors
         } catch (ServiceException.AlreadyTakenException e) {
-            sendError(ctx,403, "Error: username already taken");
+            sendError (ctx,403, "Error: username already taken");
         } catch (ServiceException.BadRequestException e){
             sendError(ctx, 400, "Error: bad request");
         } catch (Exception e){
             sendError(ctx, 500, "Error: " + e.getMessage());
         }
     };
-    private void sendError(Context ctx, int statusCode, String message){
-        var errorBody = Map.of("message", message);
-        ctx.status(statusCode);
-        ctx.contentType("application/json");
-        ctx.result(gson.toJson(errorBody));
-    }
 }

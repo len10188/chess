@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClearServiceTest {
 
     @Test
-    void ClearDataSuccessful() {
+    void clearDataSuccessful() {
 
         MemoryUserDOA userDOA = new MemoryUserDOA();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();

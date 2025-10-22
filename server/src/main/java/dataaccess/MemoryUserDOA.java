@@ -19,11 +19,6 @@ public class MemoryUserDOA implements  UserDAO{
     }
 
     @Override
-    public boolean exists(String username) {
-        return users.containsKey(username);
-    }
-
-    @Override
     public void clear() {
         users.clear();
     }

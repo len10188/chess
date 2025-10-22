@@ -46,11 +46,11 @@ public class JoinGameService {
         String username = auth.username();
         switch (request.playerColor().toLowerCase()){ // make all colors lowercase
             case "white" -> {
-                if (game.whiteUsername() != null ) throw new ServiceException.AlreadyTakenException();
+                if (game.whiteUsername() != null ) {throw new ServiceException.AlreadyTakenException();}
                 gameDAO.updateGamePlayers(request.gameID(), "white", username);
             }
             case "black" -> {
-                if (game.blackUsername() != null) throw new ServiceException.AlreadyTakenException();
+                if (game.blackUsername() != null) {throw new ServiceException.AlreadyTakenException();}
                 gameDAO.updateGamePlayers(request.gameID(), "black", username);
             }
             default -> throw new ServiceException.BadRequestException();

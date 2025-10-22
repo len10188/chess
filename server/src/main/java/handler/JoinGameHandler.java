@@ -1,14 +1,13 @@
 package handler;
 
 import com.google.gson.Gson;
-import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import request.JoinGameRequest;
 import result.JoinGameResult;
 import service.JoinGameService;
 import service.ServiceException;
 
-import java.util.Map;
+import static handler.HandlerUtils.sendError;
 
 public class JoinGameHandler {
     private JoinGameService joinGameService;
@@ -39,10 +38,4 @@ public class JoinGameHandler {
             sendError(ctx, 500, "Error: " + e.getMessage());
         }
     };
-    private void sendError(Context ctx, int statusCode, String message){
-        var errorBody = Map.of("message", message);
-        ctx.status(statusCode);
-        ctx.contentType("application/json");
-        ctx.result(gson.toJson(errorBody));
-    }
 }
