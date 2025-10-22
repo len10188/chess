@@ -17,16 +17,18 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public RegisterResult register(RegisterRequest request) throws BadRequestException, AlreadyTakenException {
+    public RegisterResult register(RegisterRequest request)
+            throws serviceException.BadRequestException, serviceException.AlreadyTakenException
+    {
         // check if request is missing information.
         if ((request.username() == null) || (request.password() == null) || (request.email() == null)){
-            throw new BadRequestException();
+            throw new serviceException.BadRequestException();
         }
 
         // check if user already exists
         UserData existing = userDAO.getUser(request.username());
         if (existing != null){
-            throw new AlreadyTakenException();
+            throw new serviceException.AlreadyTakenException();
         }
 
         // create new user
@@ -39,6 +41,5 @@ public class UserService {
         //return result to handler
         return new RegisterResult(request.username(), auth.authToken());
     }
-    public static class AlreadyTakenException extends Exception{}
-    public static class BadRequestException extends Exception{}
+
 }

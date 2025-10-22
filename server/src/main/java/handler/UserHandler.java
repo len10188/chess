@@ -1,30 +1,49 @@
 package handler;
 
+import com.google.gson.Gson;
 import request.RegisterRequest;
 import result.RegisterResult;
 import service.UserService;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import service.serviceException;
+
+import java.util.Map;
 
 public class UserHandler {
-    private final UserService userService;
+    private UserService userService;
+    private final Gson gson = new Gson();
 
     public UserHandler(UserService userService){
         this.userService = userService;
+
     }
 
     // POST /user (register)
     public Handler registerUser = ctx -> {
         try {
-            RegisterRequest request = ctx.bodyAsClass(RegisterRequest.class);
+            // parse body
+            RegisterRequest request = gson.fromJson(ctx.body(),(RegisterRequest.class));
+            //Call service
             RegisterResult result = userService.register(request);
-            ctx.status(200).json(result);
-        } catch (UserService.AlreadyTakenException e) {
-            ctx.status(403).json(new RegisterResult("Error: username already taken"));
-        } catch (UserService.BadRequestException e){
-            ctx.status(400).json(new RegisterResult("Error: bad request"));
+            // respond
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(gson.toJson(result));
+
+            // handler errors
+        } catch (serviceException.AlreadyTakenException e) {
+            sendError(ctx,403, "Error: username already taken");
+        } catch (serviceException.BadRequestException e){
+            sendError(ctx, 400, "Error: bad request");
         } catch (Exception e){
-            ctx.status(500).json(new RegisterResult("Error: " + e.getMessage()));
+            sendError(ctx, 500, "Error: " + e.getMessage());
         }
     };
+    private void sendError(Context ctx, int statusCode, String message){
+        var errorBody = Map.of("message", message);
+        ctx.status(statusCode);
+        ctx.contentType("application/json");
+        ctx.result(gson.toJson(errorBody));
+    }
 }
