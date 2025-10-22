@@ -3,7 +3,6 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import org.eclipse.jetty.server.Authentication;
 
 public class ClearService {
     private final UserDAO userDAO;

@@ -9,7 +9,7 @@ import result.JoinGameResult;
 
 public class JoinGameService {
 
-    private AuthDAO authDAO;
+    private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
     public JoinGameService(AuthDAO authDAO, GameDAO gameDAO) {

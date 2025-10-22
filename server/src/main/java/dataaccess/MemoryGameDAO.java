@@ -35,11 +35,6 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void updateGame(GameData games) {
-        gamesList.put(games.gameID(), games);
-    }
-
-    @Override
     public void updateGamePlayers(int id, String playerColor, String username) {
         GameData oldGame = gamesList.get(id);
         if (oldGame == null) {
