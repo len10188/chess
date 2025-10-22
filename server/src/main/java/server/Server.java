@@ -2,15 +2,9 @@ package server;
 
 
 import dataaccess.*;
-import handler.UserHandler;
-import handler.LoginHandler;
-import handler.LogoutHandler;
-import handler.ListGamesHandler;
+import handler.*;
 
-import service.UserService;
-import service.LoginService;
-import service.LogoutService;
-import service.ListGamesService;
+import service.*;
 
 import io.javalin.*;
 
@@ -33,6 +27,8 @@ public class Server {
         LoginService loginService = new LoginService(userDAO, authDAO);
         LogoutService logoutService = new LogoutService(authDAO);
         ListGamesService listGamesService = new ListGamesService(authDAO, gameDAO);
+        CreateGameService createGameService = new CreateGameService(authDAO, gameDAO);
+
 
 
         // Create handlers
@@ -40,12 +36,14 @@ public class Server {
         LoginHandler loginHandler = new LoginHandler(loginService);
         LogoutHandler logoutHandler = new LogoutHandler(logoutService);
         ListGamesHandler listGamesHandler = new ListGamesHandler(listGamesService);
+        CreateGameHandler createGameHandler = new CreateGameHandler(createGameService);
 
         // routes
         javalin.post("/user", userHandler.registerUser);
         javalin.post("/session", loginHandler.loginUser);
         javalin.delete("/session", logoutHandler.logoutUser);
-        javalin.get("/games", listGamesHandler.listGames);
+        javalin.get("/game", listGamesHandler.listGames);
+        javalin.post("/game", createGameHandler.createGame);
 
     }
 
