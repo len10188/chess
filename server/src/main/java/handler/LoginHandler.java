@@ -27,8 +27,14 @@ public class LoginHandler {
             // call service
             LoginResult result = loginService.login(request);
 
+            // DEBUG PRINT
+            //System.out.println("DEBUG HANDLER: Login username = " + result.username());
+
+
             ctx.status(200);
             ctx.contentType("application/json");
+            //System.out.println("DEBUG HANDLER: Login username JSON = " +  gson.toJson(result));
+
             ctx.result(gson.toJson(result));
 
         } catch (ServiceException.UnauthorizedException e) {

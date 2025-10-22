@@ -1,3 +1,3 @@
 package result;
 
-public record LoginResult(String usernames, String authToken) {}
+public record LoginResult(String username, String authToken) {}

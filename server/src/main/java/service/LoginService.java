@@ -17,6 +17,9 @@ public class LoginService {
     }
 
     public LoginResult login(LoginRequest request) throws ServiceException.UnauthorizedException, ServiceException.BadRequestException {
+        // DEBUG PRINT
+        //System.out.println("DEBUG SERVER: Login username = " + request.username());
+
         // Check if valid request
         if (request.username() == null || request.password() == null) {
             throw new ServiceException.BadRequestException();
