@@ -55,8 +55,6 @@ public class JoinGameServiceTest {
         JoinGameRequest request2 = new JoinGameRequest(auth2.authToken(), "white", game.gameID());
 
         // assert
-        assertThrows(ServiceException.AlreadyTakenException.class, () -> {
-            joinGameService.joinGame(request2);
-        });
+        assertThrows(ServiceException.AlreadyTakenException.class, () -> joinGameService.joinGame(request2));
     }
 }

@@ -44,8 +44,6 @@ public class CreateGameServiceTest {
         String gameName = "TestGame";
 
         // Act & Assert
-        assertThrows(ServiceException.UnauthorizedException.class, () -> {
-            createGameService.createGame(invalidToken, gameName);
-        });
+        assertThrows(ServiceException.UnauthorizedException.class, () -> createGameService.createGame(invalidToken, gameName));
     }
 }

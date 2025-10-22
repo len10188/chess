@@ -46,9 +46,7 @@ public class ListGamesServiceTest {
         ListGamesRequest badRequest = new ListGamesRequest("invalid_token");
 
         // Act + Assert
-        assertThrows(ServiceException.UnauthorizedException.class, () -> {
-            listGamesService.listGames(badRequest);
-        });
+        assertThrows(ServiceException.UnauthorizedException.class, () -> listGamesService.listGames(badRequest));
     }
 
 }
