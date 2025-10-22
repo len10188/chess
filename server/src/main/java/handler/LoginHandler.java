@@ -11,7 +11,7 @@ import service.ServiceException;
 import java.util.Map;
 
 public class LoginHandler {
-    private final LoginService loginService;
+    private LoginService loginService;
     private final Gson gson = new Gson();
 
     public LoginHandler(LoginService loginService) {
