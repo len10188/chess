@@ -2,8 +2,6 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
-import io.javalin.http.UnauthorizedResponse;
-import jakarta.servlet.UnavailableException;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
@@ -18,21 +16,21 @@ public class LoginService {
         this.authDAO = authDAO;
     }
 
-    public LoginResult login(LoginRequest request) throws serviceException.UnauthorizedException, serviceException.BadRequestException {
+    public LoginResult login(LoginRequest request) throws ServiceException.UnauthorizedException, ServiceException.BadRequestException {
         // Check if valid request
         if (request.username() == null || request.password() == null) {
-            throw new serviceException.BadRequestException();
+            throw new ServiceException.BadRequestException();
         }
 
         // get user from database
         UserData user = userDAO.getUser(request.username());
         if (user == null){
-            throw new serviceException.UnauthorizedException();
+            throw new ServiceException.UnauthorizedException();
         }
 
         // check password
         if (!user.password().equals(request.password())){
-            throw new serviceException.UnauthorizedException();
+            throw new ServiceException.UnauthorizedException();
         }
 
         //create AuthToken

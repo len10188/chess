@@ -1,45 +1,45 @@
 package handler;
 
 import com.google.gson.Gson;
-import request.RegisterRequest;
-import result.RegisterResult;
-import service.UserService;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import request.LoginRequest;
+import result.LoginResult;
+import service.LoginService;
 import service.ServiceException;
 
 import java.util.Map;
 
-public class UserHandler {
-    private UserService userService;
+public class LoginHandler {
+    private final LoginService loginService;
     private final Gson gson = new Gson();
 
-    public UserHandler(UserService userService){
-        this.userService = userService;
-
+    public LoginHandler(LoginService loginService) {
+        this.loginService = loginService;
     }
 
-    // POST /user (register)
-    public Handler registerUser = ctx -> {
+    // Post /session (login)
+    public Handler loginUser = ctx -> {
         try {
-            // parse body
-            RegisterRequest request = gson.fromJson(ctx.body(),(RegisterRequest.class));
-            //Call service
-            RegisterResult result = userService.register(request);
-            // respond
+            // parse
+            LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+
+            // call service
+            LoginResult result = loginService.login(request);
+
             ctx.status(200);
             ctx.contentType("application/json");
             ctx.result(gson.toJson(result));
-
-            // handler errors
-        } catch (ServiceException.AlreadyTakenException e) {
-            sendError(ctx,403, "Error: username already taken");
+        } catch (ServiceException.UnauthorizedException e) {
+            sendError(ctx,401, "Error: unauthorized");
         } catch (ServiceException.BadRequestException e){
-            sendError(ctx, 400, "Error: bad request");
+            sendError(ctx, 400, "Error: bad rquest");
         } catch (Exception e){
             sendError(ctx, 500, "Error: " + e.getMessage());
         }
+
     };
+
     private void sendError(Context ctx, int statusCode, String message){
         var errorBody = Map.of("message", message);
         ctx.status(statusCode);

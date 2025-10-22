@@ -1,8 +1,10 @@
 package server;
 
+import handler.LoginHandler;
 import io.javalin.*;
 import handler.UserHandler;
 import org.eclipse.jetty.server.Authentication;
+import service.LoginService;
 import service.UserService;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDOA;
@@ -24,12 +26,15 @@ public class Server {
 
         // Create services
         UserService userService = new UserService(userDAO, authDAO);
+        LoginService loginService = new LoginService(userDAO, authDAO);
 
         // Create handler
         UserHandler userHandler = new UserHandler(userService);
+        LoginHandler loginHandler = new LoginHandler(loginService);
 
         // routes
         javalin.post("/user", userHandler.registerUser);
+        javalin.post("/session", loginHandler.loginUser);
 
 
 

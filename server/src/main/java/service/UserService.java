@@ -3,7 +3,6 @@ import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import request.RegisterRequest;
 import result.RegisterResult;
 
@@ -18,17 +17,17 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest request)
-            throws serviceException.BadRequestException, serviceException.AlreadyTakenException
+            throws ServiceException.BadRequestException, ServiceException.AlreadyTakenException
     {
         // check if request is missing information.
         if ((request.username() == null) || (request.password() == null) || (request.email() == null)){
-            throw new serviceException.BadRequestException();
+            throw new ServiceException.BadRequestException();
         }
 
         // check if user already exists
         UserData existing = userDAO.getUser(request.username());
         if (existing != null){
-            throw new serviceException.AlreadyTakenException();
+            throw new ServiceException.AlreadyTakenException();
         }
 
         // create new user

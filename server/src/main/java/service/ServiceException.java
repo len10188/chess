@@ -1,7 +1,7 @@
 package service;
 
-public class serviceException extends RuntimeException {
-    public serviceException(String message) {
+public class ServiceException extends RuntimeException {
+    public ServiceException(String message) {
         super(message);
     }
 
