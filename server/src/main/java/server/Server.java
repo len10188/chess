@@ -28,7 +28,7 @@ public class Server {
         LogoutService logoutService = new LogoutService(authDAO);
         ListGamesService listGamesService = new ListGamesService(authDAO, gameDAO);
         CreateGameService createGameService = new CreateGameService(authDAO, gameDAO);
-
+        JoinGameService joinGameService = new JoinGameService(authDAO, gameDAO);
 
 
         // Create handlers
@@ -37,6 +37,7 @@ public class Server {
         LogoutHandler logoutHandler = new LogoutHandler(logoutService);
         ListGamesHandler listGamesHandler = new ListGamesHandler(listGamesService);
         CreateGameHandler createGameHandler = new CreateGameHandler(createGameService);
+        JoinGameHandler joinGameHandler = new JoinGameHandler(joinGameService);
 
         // routes
         javalin.post("/user", userHandler.registerUser);
@@ -44,6 +45,7 @@ public class Server {
         javalin.delete("/session", logoutHandler.logoutUser);
         javalin.get("/game", listGamesHandler.listGames);
         javalin.post("/game", createGameHandler.createGame);
+        javalin.put("/game", joinGameHandler.joinGame);
 
     }
 
