@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class HandlerUtils {
 
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     private HandlerUtils() {
 
@@ -17,6 +17,6 @@ public class HandlerUtils {
         var errorBody = Map.of("message", message);
         ctx.status(statusCode);
         ctx.contentType("application/json");
-        ctx.result(gson.toJson(errorBody));
+        ctx.result(GSON.toJson(errorBody));
     }
 }
