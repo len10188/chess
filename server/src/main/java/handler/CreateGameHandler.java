@@ -25,7 +25,7 @@ public class CreateGameHandler {
 
             CreateGameResult result = createGameService.createGame(authToken, request.gameName());
 
-            // success
+            // success response
             ctx.status(200);
             ctx.contentType("application/json");
             ctx.result(gson.toJson(result));
