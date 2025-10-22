@@ -3,30 +3,32 @@ package handler;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import request.LoginRequest;
-import result.LoginResult;
-import service.LoginService;
+import request.LogoutRequest;
+import result.LogoutResult;
+import service.LogoutService;
 import service.ServiceException;
 
 import java.util.Map;
 
-public class LoginHandler {
-    private LoginService loginService;
+public class LogoutHandler {
+    private LogoutService logoutService;
     private final Gson gson = new Gson();
 
-    public LoginHandler(LoginService loginService) {
-        this.loginService = loginService;
+    public LogoutHandler(LogoutService logoutService){
+        this.logoutService = logoutService;
     }
 
-    // Post /session (login)
-    public Handler loginUser = ctx -> {
+    // DELETE /session (logout)
+    public Handler logoutUser = ctx -> {
         try {
-            // parse
-            LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+            // get token from header
+            String authToken = ctx.header("Authorization");
+            LogoutRequest request = new LogoutRequest(authToken);
 
-            // call service
-            LoginResult result = loginService.login(request);
+            // Call service
+            LogoutResult result = logoutService.logout(request);
 
+            // respond successful
             ctx.status(200);
             ctx.contentType("application/json");
             ctx.result(gson.toJson(result));
