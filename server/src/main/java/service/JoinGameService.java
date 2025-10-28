@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;
@@ -18,10 +19,9 @@ public class JoinGameService {
     }
 
     public JoinGameResult joinGame(JoinGameRequest request)
-        throws ServiceException.UnauthorizedException,
+            throws ServiceException.UnauthorizedException,
             ServiceException.AlreadyTakenException,
-            ServiceException.BadRequestException
-    {
+            ServiceException.BadRequestException, DataAccessException {
         // validate input
         if (request.authToken() == null || request.authToken().isEmpty()) {
             throw new ServiceException.UnauthorizedException();

@@ -1,10 +1,13 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;
 import result.CreateGameResult;
+
+import java.sql.SQLException;
 
 public class CreateGameService {
     private final AuthDAO authDAO;
@@ -16,7 +19,7 @@ public class CreateGameService {
     }
 
     public CreateGameResult createGame(String authToken, String gameName)
-        throws ServiceException.UnauthorizedException, ServiceException.BadRequestException{
+            throws ServiceException.UnauthorizedException, ServiceException.BadRequestException, SQLException, DataAccessException {
 
         // authToken is bad.
         if (authToken == null || authToken.isEmpty()) {
