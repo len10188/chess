@@ -19,7 +19,7 @@ public class SQLGameDAO implements GameDAO {
             whiteUsername VARCHAR(255) DEFAULT NULL,
             blackUsername VARCHAR(255) DEFAULT NULL,
             gameName VARCHAR(255) NOT NULL,
-            game TEXT NOT NULL, 
+            game TEXT NOT NULL,
             PRIMARY KEY (gameID),
             INDEX(gameName)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
@@ -70,13 +70,49 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData getGame(int id) {
-        return null;
+    public GameData getGame(int id) throws DataAccessException {
+        String sql = "SELECT * FROM games WHERE gameID = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             var statement =  conn.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+            try (var resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String whiteU = resultSet.getString("whiteUsername");
+                    String blackU = resultSet.getString("blackUsername");
+                    String gameName = resultSet.getString("gameName");
+                    var json = resultSet.getString("game");
+                    ChessGame chessGame = gson.fromJson(json, ChessGame.class);
+                    return new GameData(id, whiteU, blackU, gameName, chessGame);
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error retrieving game: " + e.getMessage());
+        }
     }
 
     @Override
-    public Collection<GameData> listGames() {
-        return List.of();
+    public Collection<GameData> listGames() throws DataAccessException, SQLException {
+        ArrayList<GameData> games = new ArrayList<GameData>();
+        String sql = "SELECT * FROM games";
+        try (Connection conn = DatabaseManager.getConnection();
+             var statement = conn.prepareStatement(sql);
+             var resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("gameID");
+                String whiteU = resultSet.getString("whiteUsername");
+                String blackU = resultSet.getString("blackUsername");
+                String gameName = resultSet.getString("gameName");
+                var json = resultSet.getString("game");
+                ChessGame chessGame = gson.fromJson(json, ChessGame.class);
+                games.add(new GameData(id, whiteU, blackU, gameName, chessGame));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error listing games: " + e.getMessage());
+        }
+        return games;
     }
 
     @Override
