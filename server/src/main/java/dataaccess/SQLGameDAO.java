@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import service.ServiceException;
 
 import java.sql.*;
 import java.util.*;
@@ -93,8 +92,8 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException, SQLException {
-        ArrayList<GameData> games = new ArrayList<GameData>();
+    public Collection<GameData> listGames() throws DataAccessException {
+        ArrayList<GameData> games = new ArrayList<>();
         String sql = "SELECT * FROM games";
         try (Connection conn = DatabaseManager.getConnection();
              var statement = conn.prepareStatement(sql);
@@ -116,12 +115,46 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public void updateGamePlayers(int id, String playerColor, String username) {
+    public void updateGamePlayers(int id, String playerColor, String username) throws DataAccessException {
+        var column = switch (playerColor.toLowerCase()) {
+            case "white" -> "whiteUsername";
+            case "black" -> "blackUsername";
+            default -> throw new DataAccessException("Invalid player color: " + playerColor);
+        };
 
+        var checkColorSql = "SELECT " + column + " FROM games WHERE gameID = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+            var checkStatement = conn.prepareStatement(checkColorSql)) {
+
+            checkStatement.setInt(1, id);
+            try (var resultSet = checkStatement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new DataAccessException("Game not found");
+                }
+                var existingPlayer = resultSet.getString(column);
+                if (existingPlayer != null) {
+                    throw new DataAccessException("Player color already taken");
+                }
+            }
+
+            var updateSql = "UPDATE games SET " + column + " = ? WHERE gameID = ?";
+            try (var updateStatement = conn.prepareStatement(updateSql)) {
+                updateStatement.setString(1, username);
+                updateStatement.setInt(2, id);
+                updateStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating player: " + e.getMessage());
+        }
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection();
+        var statement = conn.prepareStatement("TRUNCATE TABLE games")) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error clearing games: " + e.getMessage());
+        }
     }
 }
