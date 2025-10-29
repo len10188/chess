@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
@@ -16,7 +17,7 @@ public class LoginService {
         this.authDAO = authDAO;
     }
 
-    public LoginResult login(LoginRequest request) throws ServiceException.UnauthorizedException, ServiceException.BadRequestException {
+    public LoginResult login(LoginRequest request) throws ServiceException.UnauthorizedException, ServiceException.BadRequestException, DataAccessException {
         // DEBUG PRINT
         //System.out.println("DEBUG SERVER: Login username = " + request.username());
 
@@ -32,7 +33,7 @@ public class LoginService {
         }
 
         // check password
-        if (!user.password().equals(request.password())){
+        if (!userDAO.verifyUser(request.username(), request.password())){
             throw new ServiceException.UnauthorizedException();
         }
 
