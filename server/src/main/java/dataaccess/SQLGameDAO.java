@@ -14,15 +14,16 @@ public class SQLGameDAO implements GameDAO {
     private final String[] createStatement = {
             """
             CREATE TABLE IF NOT EXISTS games (
-            gameID INT NOT NULL AUTH_INCREMENT,
+            gameID INT NOT NULL AUTO_INCREMENT,
             whiteUsername VARCHAR(255) DEFAULT NULL,
             blackUsername VARCHAR(255) DEFAULT NULL,
-            gameName VARCHAR(255) NOT NULL,
-            game TEXT NOT NULL,
+            gameName VARCHAR(255),
+            game TEXT,
             PRIMARY KEY (gameID),
-            INDEX(gameName)
+            INDEX(gameID)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-"""
+    """
+
     };
 
     public SQLGameDAO() throws DataAccessException {
@@ -47,7 +48,7 @@ public class SQLGameDAO implements GameDAO {
         ChessGame chessGame = new ChessGame();
         var json = gson.toJson(chessGame);
 
-        String sql = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
         var statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setNull(1, Types.VARCHAR);
