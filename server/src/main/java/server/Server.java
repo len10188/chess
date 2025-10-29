@@ -8,6 +8,8 @@ import service.*;
 
 import io.javalin.*;
 
+import javax.xml.crypto.Data;
+
 public class Server {
 
     private final Javalin javalin;
@@ -15,12 +17,20 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // Register your endpoints and exception handlers here.
+        UserDAO userDAO;
+        AuthDAO authDAO;
+        GameDAO gameDAO;
+        try {
+            // Set DAO type
+            DAOSwitch.useDatabase();
 
-        // Create DAO
-        UserDAO userDAO = new MemoryUserDOA();
-        AuthDAO authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+            // Create DAO
+            userDAO = DAOSwitch.setUserDAO();
+            authDAO = DAOSwitch.setAuthDAO();
+            gameDAO = DAOSwitch.setGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // Create services
         UserService userService = new UserService(userDAO, authDAO);

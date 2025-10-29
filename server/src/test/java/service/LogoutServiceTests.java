@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DAOSwitch;
 import dataaccess.MemoryAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ public class LogoutServiceTests {
 
     @BeforeEach
     void setUp() {
+        DAOSwitch.useMemory();
         authDAO = new MemoryAuthDAO();
         logoutService = new LogoutService(authDAO);
 

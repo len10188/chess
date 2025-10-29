@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDOA;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
@@ -14,6 +11,7 @@ public class ClearServiceTest {
 
     @Test
     void clearDataSuccessful() throws DataAccessException {
+        DAOSwitch.useMemory();
 
         MemoryUserDOA userDOA = new MemoryUserDOA();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();

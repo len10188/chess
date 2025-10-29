@@ -1,15 +1,14 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
+import dataaccess.*;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.ListGamesRequest;
 import result.ListGamesResult;
 
+
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,9 +17,11 @@ public class ListGamesServiceTest {
     private ListGamesService listGamesService;
 
     @BeforeEach
-    void setup() {
-        authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+    void setup() throws SQLException, DataAccessException {
+        DAOSwitch.useMemory();
+
+        authDAO = DAOSwitch.setAuthDAO();
+        GameDAO gameDAO = DAOSwitch.setGameDAO();
         listGamesService = new ListGamesService(authDAO, gameDAO);
 
         // load games

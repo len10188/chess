@@ -17,6 +17,7 @@ public class CreateGameServiceTest {
 
     @BeforeEach
     void setup() {
+        DAOSwitch.useMemory();
         authDAO = new MemoryAuthDAO();
         gameDAO = new MemoryGameDAO();
         createGameService = new CreateGameService(authDAO, gameDAO);

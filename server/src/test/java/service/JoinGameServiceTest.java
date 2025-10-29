@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DAOSwitch;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import model.AuthData;
@@ -18,6 +19,7 @@ public class JoinGameServiceTest {
 
     @BeforeEach
     void setup() {
+        DAOSwitch.useMemory();
         authDAO = new MemoryAuthDAO();
         gameDAO = new MemoryGameDAO();
         joinGameService = new JoinGameService(authDAO, gameDAO);

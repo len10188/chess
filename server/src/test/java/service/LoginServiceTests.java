@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DAOSwitch;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDOA;
 import model.UserData;
@@ -15,6 +16,7 @@ public class LoginServiceTests {
 
     @BeforeEach
     void setUp() {
+        DAOSwitch.useMemory();
         MemoryUserDOA userDOA = new MemoryUserDOA();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         loginService = new LoginService(userDOA, authDAO);

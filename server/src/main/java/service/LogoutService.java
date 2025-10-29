@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import request.LogoutRequest;
 import result.LogoutResult;
@@ -13,7 +14,7 @@ public class LogoutService {
     }
 
     public LogoutResult logout(LogoutRequest request)
-            throws ServiceException.UnauthorizedException, ServiceException.BadRequestException {
+            throws ServiceException.UnauthorizedException, ServiceException.BadRequestException, DataAccessException {
 
         // check authToken
         if (request.authToken() == null || request.authToken().isEmpty()){

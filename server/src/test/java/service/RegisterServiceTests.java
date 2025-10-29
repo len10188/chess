@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDOA;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.RegisterRequest;
@@ -16,6 +13,7 @@ public class RegisterServiceTests {
 
     @BeforeEach
     void setUp() {
+        DAOSwitch.useMemory();
         UserDAO userDAO = new MemoryUserDOA();
         AuthDAO authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);

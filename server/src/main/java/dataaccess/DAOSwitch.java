@@ -1,8 +1,10 @@
 package dataaccess;
 
 public class DAOSwitch {
-    private static final boolean USE_DATABASE = true; // false = memory, true = database.
+    private static boolean USE_DATABASE = true;// false = memory, true = database.
 
+    public static void useMemory() {USE_DATABASE = false;}
+    public static void useDatabase() {USE_DATABASE = true;}
     public static GameDAO setGameDAO() throws DataAccessException {
         if (USE_DATABASE) {
             return new SQLGameDAO();

@@ -1,5 +1,6 @@
 package service;
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
@@ -17,8 +18,7 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest request)
-            throws ServiceException.BadRequestException, ServiceException.AlreadyTakenException
-    {
+            throws ServiceException.BadRequestException, ServiceException.AlreadyTakenException, DataAccessException {
         // check if request is missing information.
         if ((request.username() == null) || (request.password() == null) || (request.email() == null)){
             throw new ServiceException.BadRequestException();
