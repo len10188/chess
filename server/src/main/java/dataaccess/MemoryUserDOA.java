@@ -19,6 +19,15 @@ public class MemoryUserDOA implements  UserDAO{
     }
 
     @Override
+    public boolean verifyUser(String username, String providedPassword) throws DataAccessException {
+        UserData user = getUser(username);
+        if (user == null) {
+            return false;
+        }
+        return providedPassword.equals(user.password());
+    }
+
+    @Override
     public void clear() {
         users.clear();
     }
