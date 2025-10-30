@@ -17,7 +17,8 @@ public class LoginService {
         this.authDAO = authDAO;
     }
 
-    public LoginResult login(LoginRequest request) throws ServiceException.UnauthorizedException, ServiceException.BadRequestException, DataAccessException {
+    public LoginResult login(LoginRequest request) throws
+            ServiceException.UnauthorizedException, ServiceException.BadRequestException, DataAccessException {
         // DEBUG PRINT
         //System.out.println("DEBUG SERVER: Login username = " + request.username());
 
