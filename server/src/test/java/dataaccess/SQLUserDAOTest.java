@@ -70,6 +70,6 @@ public class SQLUserDAOTest {
     void clearUsers() throws DataAccessException {
         userDAO.createUser(user);
         userDAO.clear();
-        assertNull(userDAO.getUser("test"));
+        assertNull(userDAO.getUser("test"), "There should be no users left after clear");
     }
 }
