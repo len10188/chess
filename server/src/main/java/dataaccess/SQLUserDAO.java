@@ -9,8 +9,6 @@ import java.util.*;
 
 public class SQLUserDAO implements UserDAO{
 
-    private final Gson gson = new Gson();
-
     private final String[] createStatement = {
             """
             CREATE TABLE IF NOT EXISTS users (

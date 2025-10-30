@@ -42,5 +42,5 @@ public class CreateGameService {
 
         // return result
         return new CreateGameResult(newGame.gameID());
-    };
+    }
 }

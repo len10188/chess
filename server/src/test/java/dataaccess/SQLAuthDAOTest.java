@@ -3,7 +3,6 @@ package dataaccess;
 import model.AuthData;
 import org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,7 +63,7 @@ public class SQLAuthDAOTest {
     }
 
     @Test
-    void deleteAuthNegative() throws DataAccessException {
+    void deleteAuthNegative() {
         assertDoesNotThrow(() ->authDAO.deleteAuth("test"), "tyring to delete a non-existent auth token"+
                 "is graceful");
     }
