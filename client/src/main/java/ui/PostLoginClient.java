@@ -66,11 +66,11 @@ public class PostLoginClient {
         }
     }
 
-    private String createGame(String name) throws Exception {
+    private String createGame(String gameName) throws Exception {
         try {
-            var game = facade.createGame(name);
-            if (game == null) return "Game creation failed.";
-            return "Created game: " +game.gameName();
+            String createdGameName = facade.createGame(gameName);
+            if (createdGameName == null) return "Game creation failed.";
+            return "Created game: " + createdGameName;
         } catch (Exception e) {
             return "Create failed: " + e.getMessage();
         }

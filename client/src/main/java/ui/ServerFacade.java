@@ -9,6 +9,7 @@ import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.JoinGameResult;
+import result.CreateGameResult;
 import result.ListGamesResult;
 
 import java.io.IOException;
@@ -60,10 +61,16 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
-    public GameData createGame(String gameName) throws IOException, URISyntaxException {
+    public String createGame(String gameName) throws IOException, URISyntaxException {
         String path = "/game";
-        CreateGameRequest emptyGame = new CreateGameRequest(gameName, null);
-        return this.makeRequest("POST", path, emptyGame, GameData.class);
+        CreateGameRequest request = new CreateGameRequest(gameName, authToken);
+        var result = this.makeRequest("POST", path, request, CreateGameResult.class);
+        if (result == null) return null;
+        if (result.gameID() < 1) {
+            return null; // create failed.
+        } else {
+            return gameName;
+        }
     }
 
     public Collection<GameData> listGames() throws IOException, URISyntaxException {
@@ -75,10 +82,11 @@ public class ServerFacade {
         return null;
     }
 
-    public void joinGame (String playerColor, int gameID) throws IOException, URISyntaxException {
+    public boolean joinGame (String playerColor, int gameID) throws IOException, URISyntaxException {
         String path = "/game";
         JoinGameRequest request = new JoinGameRequest(null, playerColor, gameID);
-        this.makeRequest("PUT", path, request, Void.class);
+        var result = this.makeRequest("PUT", path, request, null);
+        return result != null ;
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws IOException, URISyntaxException {
@@ -101,20 +109,20 @@ public class ServerFacade {
         connection.connect();
         int status = connection.getResponseCode();
 
-        // read the response body
-        InputStream bodyStream;
-        if (status >= 200 && status < 300) {
-            bodyStream = connection.getInputStream();
-        } else {
-            bodyStream = connection.getErrorStream();
-        }
 
-        if (responseClass == null || bodyStream == null) {
+        if (status < 200 || status >= 300){
             connection.disconnect();
             return null;
         }
 
-        try (InputStreamReader reader = new InputStreamReader(bodyStream)) {
+        if (responseClass == null) {
+            connection.disconnect();
+            //noinspection unchecked
+            return (T) Boolean.TRUE;
+        }
+
+        try (InputStream bodyStream = connection.getInputStream();
+        InputStreamReader reader = new InputStreamReader(bodyStream)) {
             return gson.fromJson(reader, responseClass);
         } finally {
             connection.disconnect();
