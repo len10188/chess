@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
@@ -61,7 +62,7 @@ public class ServerFacade {
 
     public GameData createGame(String gameName) throws IOException, URISyntaxException {
         String path = "/game";
-        GameData emptyGame = new GameData(0, null, null, gameName, null);
+        CreateGameRequest emptyGame = new CreateGameRequest(gameName, null);
         return this.makeRequest("POST", path, emptyGame, GameData.class);
     }
 
@@ -73,7 +74,7 @@ public class ServerFacade {
 
     public void joinGame (String playerColor, int gameID) throws IOException, URISyntaxException {
         String path = "/game";
-        JoinGameRequest request = new JoinGameRequest(authToken, playerColor, gameID);
+        JoinGameRequest request = new JoinGameRequest(null, playerColor, gameID);
         this.makeRequest("PUT", path, request, Void.class);
     }
 
