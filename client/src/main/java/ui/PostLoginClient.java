@@ -103,7 +103,7 @@ public class PostLoginClient {
         try {
             facade.joinGame(null, game.gameID());
 
-            var board = DrawBoard.renderInitial(ChessGame.TeamColor.WHITE);
+            var board = printBoard.render(game.game().getBoard(), ChessGame.TeamColor.WHITE);
             return "Observing game: \nBOARD\n" + board;
         } catch (Exception e) {
             return "Watch game failed: " + e.getMessage();
