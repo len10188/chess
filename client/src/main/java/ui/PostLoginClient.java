@@ -26,7 +26,7 @@ public class PostLoginClient {
         Options:
         List current games: 'l', 'list'
         Create a new game: 'c', 'create' <GAME NAME>
-        Join a game: 'j', 'join', <GAME ID> <COLOR>
+        Join a game: 'j', 'join', <GAME ID> <WHITE|BLACK>
         Watch a game: 'w', 'watch' <GAME ID>
         Logout: 'logout'
         """;
@@ -86,9 +86,9 @@ public class PostLoginClient {
 
             // draw board
             if (color.equals("white")){
-                var board = PrintBoard.main(new chess.ChessGame(), ChessGame.TeamColor.WHITE);
+                var board = DrawBoard.main(new chess.ChessGame(), ChessGame.TeamColor.WHITE);
             } else {
-                var board = PrintBoard.main(new chess.ChessGame(), ChessGame.TeamColor.BLACK);
+                var board = DrawBoard.main(new chess.ChessGame(), ChessGame.TeamColor.BLACK);
             }
             return "Joined game as " + color + ":\nBOARD\n" + board;
         } catch (Exception e) {
@@ -101,7 +101,7 @@ public class PostLoginClient {
         try {
             facade.joinGame(null, game.gameID());
 
-            var board = PrintBoard.main(new chess.ChessGame(), ChessGame.TeamColor.WHITE);
+            var board = DrawBoard.main(new chess.ChessGame(), ChessGame.TeamColor.WHITE);
             return "Observing game: \nBOARD\n" + board;
         } catch (Exception e) {
             return "Watch game failed: " + e.getMessage();
@@ -122,10 +122,44 @@ public class PostLoginClient {
             case "create", "c" -> {
                 if (parts.length < 2) yield "Too few arguments provided. Usage: create <game_name>";
                 else if (parts.length > 2) yield  "Too many arguments provided. Usage: create <game_name>";
-                else yield "Create game failed. :(";
+                yield createGame(parts[1]);
             }
+            case "join", "j" -> {
+                if (parts.length < 3 ) yield "Too few arguments provided. Usage: join <number> <while|black>";
+                if (parts.length > 3 ) yield "Too many arguments provided. Usage: join <number> <while|black>";
+                int gameNum = parseInt(parts[1]);
+                if (gameNum < 1 || gameNum > lastListedGames.size()) {
+                    yield "Invalid game number. Use 'list' to see games.";
+                }
+                String color = parts[2].toLowerCase();
+                yield playGame(gameNum, color);
+            }
+            case "watch", "w" -> {
+                if (parts.length < 2) yield "Too few arguments provided. Usage: watch <number>";
+                int gameNum = parseInt(parts[1]);
+                if (gameNum < 1 || gameNum > lastListedGames.size()) {
+                    yield "Invalid game number. Use 'list' to see games.";
+                }
+                yield watchGame(gameNum);
+            }
+            default -> "Unknown command. Try 'help'.";
+        };
+    }
+
+    // helper funcs
+    private int parseInt(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 
-    // helper fun
+    private String showPlayer(String name) {
+        if (name == null || name.isBlank()){
+            return "-";
+        } else {
+            return name;
+        }
+    }
 }
