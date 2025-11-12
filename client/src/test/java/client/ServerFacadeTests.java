@@ -141,23 +141,37 @@ public class ServerFacadeTests {
 
     @Test
     void joinGameNegative_alreadyTaken() throws Exception {
-        // user1 takes white
-        ServerFacade facade1 = new ServerFacade(baseUrl);
-        facade1.register("player1", "password", "test@email.com");
-        GameData game = facade1.createGame("TestGame");
-        facade1.joinGame("white", game.gameID());
+        // user1 creates game and takes white
+        ServerFacade f1 = new ServerFacade(baseUrl);
+        f1.register("player1", "password", "p1@email.com");
 
-        // user2 tries to also take white (server should reject)
-        ServerFacade facade2 = new ServerFacade(baseUrl);
-        facade2.register("player2", "password", "test@email.com");
-        // Your facade's joinGame returns void and swallows error bodies,
-        // so we validate state instead of expecting an exception.
-        facade2.joinGame("white", game.gameID());
+        String created = f1.createGame("TestGame");
+        assertNotNull(created, "game should be created");
 
-        // Check that white is still player1
-        Collection<GameData> games = facade2.listGames();
-        GameData found = games.stream().filter(g -> g.gameID() == game.gameID()).findFirst().orElse(null);
-        assertNotNull(found);
+        GameData game = f1.listGames().stream()
+                .filter(g -> "TestGame".equals(g.gameName()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Created game not found in listGames"));
+
+        assertTrue(f1.joinGame("white", game.gameID()),
+                "first player should be able to claim white");
+
+        // user2 tries to also take white (should be rejected)
+        ServerFacade f2 = new ServerFacade(baseUrl);
+        f2.register("player2", "password", "p2@email.com");
+
+        boolean joined = f2.joinGame("white", game.gameID());
+        assertFalse(joined, "second player should be rejected when seat already taken");
+
+        // verify white seat still belongs to player1
+        Collection<GameData> games = f2.listGames();
+        assertNotNull(games, "listGames should not be null");
+        GameData found = games.stream()
+                .filter(g -> g.gameID() == game.gameID())
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(found, "game should still exist");
         assertEquals("player1", found.whiteUsername(),
                 "white seat should remain with the first player after second attempt");
     }
