@@ -1,51 +1,42 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
-
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import static ui.EscapeSequences.*;
+import static ui.EscapeSequences.BLACK_BISHOP;
+import static ui.EscapeSequences.BLACK_KING;
+import static ui.EscapeSequences.BLACK_KNIGHT;
+import static ui.EscapeSequences.BLACK_PAWN;
+import static ui.EscapeSequences.BLACK_QUEEN;
+import static ui.EscapeSequences.BLACK_ROOK;
+import static ui.EscapeSequences.EMPTY;
+import static ui.EscapeSequences.RESET_BG_COLOR;
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+import static ui.EscapeSequences.SET_BG_COLOR_DARK_GREY;
+import static ui.EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.WHITE_BISHOP;
+import static ui.EscapeSequences.WHITE_KING;
+import static ui.EscapeSequences.WHITE_KNIGHT;
+import static ui.EscapeSequences.WHITE_PAWN;
+import static ui.EscapeSequences.WHITE_QUEEN;
+import static ui.EscapeSequences.WHITE_ROOK;
 
-
-public class DrawBoard {
-    private DrawBoard() {}
+public class printBoard {
 
     private static final int CELL_W = 4;
-    private static final String EMPTY_PIECE = " ";
 
     public static String renderInitial(ChessGame.TeamColor perspective) {
-
-        // make 8x8 char array
-        String[][] board = new String[8][8];
-
-        // Rank 8: black pieces
-        board[7] = new String[]{
-            BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK
-            };
-        // Rank 7: black pawn
-        board[6] = fillRow(BLACK_PAWN);
-
-        // RANK 6 to 3: empty
-        board[5] = fillRow(EMPTY);
-        board[4] = fillRow(EMPTY);
-        board[3] = fillRow(EMPTY);
-        board[2] = fillRow(EMPTY);
-
-        //Rank 2: white pawn
-        board[1] = fillRow(WHITE_PAWN);
-
-        //Rank 1: white pieces
-        board[0] = new String[]{
-                WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK
-        };
-
-        return renderBoard(board, perspective);
-
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        return render(board, perspective);
     }
 
-    private static String renderBoard(String[][] boardWhitePersp, ChessGame.TeamColor persp) {
+    private static String render(ChessBoard board, ChessGame.TeamColor persp) {
         StringBuilder stringBuilder = new StringBuilder();
-
-
 
         //Choose perspective
         int[] rankOrder = (persp == ChessGame.TeamColor.WHITE)
@@ -61,15 +52,15 @@ public class DrawBoard {
         for (int rank : rankOrder) {
             int rankNumber = rank + 1;
             // left label rank
-            stringBuilder.append(SET_TEXT_COLOR_BLUE).append(' ').append(rankNumber).append(' ').append(RESET_TEXT_COLOR);
+            stringBuilder.append(SET_TEXT_COLOR_BLUE).append(rankNumber).append(' ').append(RESET_TEXT_COLOR);
 
             for (int file : fileOrder) {
 
                 boolean lightSquare = ((file + rankNumber) % 2 == 0);
                 String bg = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
 
-                String piece = boardWhitePersp[rank][file];
-                String glyph = (piece == null) ? EMPTY : piece;
+                ChessPiece piece = board.getPiece(new ChessPosition(rankNumber, file + 1));
+                String glyph = (piece == null) ? EMPTY : pieceToGlyph;
 
 
 
@@ -79,6 +70,7 @@ public class DrawBoard {
             // right rank label
             stringBuilder.append(' ').append(SET_TEXT_COLOR_BLUE).append(rankNumber).append(RESET_TEXT_COLOR).append('\n');
         }
+        // bottom file footer
         stringBuilder.append(filesHeader(persp)).append('\n');
 
         return stringBuilder.toString();
@@ -111,4 +103,18 @@ public class DrawBoard {
         return (" " + s + " ");
     }
 
+    private static String pieceToGlyph (ChessPiece piece){
+        ChessGame.TeamColor color = piece.getTeamColor();
+        ChessPiece.PieceType type = piece.getPieceType();
+
+        switch (type) {
+            case KING:   return color == ChessGame.TeamColor.WHITE ? WHITE_KING : BLACK_KING;
+            case QUEEN:  return color == ChessGame.TeamColor.WHITE ? WHITE_QUEEN : BLACK_QUEEN;
+            case ROOK:   return color == ChessGame.TeamColor.WHITE ? WHITE_ROOK : BLACK_ROOK;
+            case BISHOP: return color == ChessGame.TeamColor.WHITE ? WHITE_BISHOP : BLACK_BISHOP;
+            case KNIGHT: return color == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT;
+            case PAWN:   return color == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN;
+            default:     return EMPTY;
+        }
+    }
 }
