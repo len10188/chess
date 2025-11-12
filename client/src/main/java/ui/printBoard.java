@@ -52,23 +52,23 @@ public class printBoard {
         for (int rank : rankOrder) {
             int rankNumber = rank + 1;
             // left label rank
-            stringBuilder.append(SET_TEXT_COLOR_BLUE).append(rankNumber).append(' ').append(RESET_TEXT_COLOR);
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ").append(QUARTER_SPACE).append(rankNumber).append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
 
             for (int file : fileOrder) {
 
                 boolean lightSquare = ((file + rankNumber) % 2 == 0);
-                String bg = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
+                String bg = lightSquare ? SET_BG_COLOR_LIGHT_LIGHT_GREY : SET_BG_COLOR_LIGHT_GREY;
 
                 ChessPiece piece = board.getPiece(new ChessPosition(rankNumber, file + 1));
                 String glyph = (piece == null) ? EMPTY : pieceToGlyph(piece);
 
 
 
-                stringBuilder.append(bg).append(glyph).append(RESET_BG_COLOR);
+                stringBuilder.append(bg).append(SET_TEXT_COLOR_BLACK).append(glyph).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
             }
 
             // right rank label
-            stringBuilder.append(' ').append(SET_TEXT_COLOR_BLUE).append(rankNumber).append(RESET_TEXT_COLOR).append('\n');
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ").append(QUARTER_SPACE).append(rankNumber).append(" ").append(LITTLE_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR).append('\n');
         }
         // bottom file footer
         stringBuilder.append(filesHeader(persp)).append('\n');
@@ -78,17 +78,17 @@ public class printBoard {
     private static String filesHeader(ChessGame.TeamColor persp) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(SET_TEXT_COLOR_BLUE).append(EMPTY);
+        stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(EMPTY);
         if (persp == ChessGame.TeamColor.WHITE) {
             for (char file = 'a'; file <= 'h'; file++) {
-                stringBuilder.append(center(String.valueOf(file), CELL_W));
+                stringBuilder.append(HALF_SPACE).append(center(String.valueOf(file), CELL_W));
             }
         } else {
             for (char file = 'h'; file >= 'a'; file--) {
-                stringBuilder.append(center(String.valueOf(file), CELL_W));
+                stringBuilder.append(HALF_SPACE).append(center(String.valueOf(file), CELL_W));
             }
         }
-        stringBuilder.append(RESET_TEXT_COLOR);
+        stringBuilder.append("  ").append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         return stringBuilder.toString();
     }
 
@@ -100,7 +100,7 @@ public class printBoard {
 
     public static String center (String s, int width) {
 
-        return (" " + s + " ");
+        return (BIG_HALF_SPACE + HALF_SPACE + s + HALF_SPACE + BIG_HALF_SPACE);
     }
 
     private static String pieceToGlyph (ChessPiece piece){
