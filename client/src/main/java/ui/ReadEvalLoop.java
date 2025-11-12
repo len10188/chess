@@ -17,6 +17,7 @@ public class ReadEvalLoop implements MessageHandler {
 
     public void run() {
         System.out.println(preLogin.welcome());
+        System.out.println(preLogin.help());
 
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
