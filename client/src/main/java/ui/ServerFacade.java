@@ -59,6 +59,7 @@ public class ServerFacade {
         }
         String path = "/session";
         this.makeRequest("DELETE", path, null, null);
+        this.authToken = null;
     }
 
     public String createGame(String gameName) throws IOException, URISyntaxException {

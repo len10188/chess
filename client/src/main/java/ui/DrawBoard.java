@@ -41,37 +41,37 @@ public class DrawBoard {
     private static String renderBoard(String[][] boardWhitePersp, ChessGame.TeamColor persp) {
         StringBuilder stringBuilder = new StringBuilder();
 
+
+
+        //Choose perspective
+        int[] rankOrder = (persp == ChessGame.TeamColor.WHITE)
+                ? new int []{7,6,5,4,3,2,1,0}
+                : new int []{0,1,2,3,4,5,6,7};
+        int[] fileOrder = (persp == ChessGame.TeamColor.WHITE)
+                ? new int []{0,1,2,3,4,5,6,7}
+                : new int []{7,6,5,4,3,2,1,0};
+
         // Top border
         stringBuilder.append(filesHeader(persp)).append('\n');
 
-        //Choose perspective
-        int startRank = (persp == ChessGame.TeamColor.WHITE) ? 8 : 1;
-        int endRank = (persp == ChessGame.TeamColor.WHITE) ? 1 : 8;
-        int rankStep = (persp == ChessGame.TeamColor.WHITE) ? 1 : -1;
-
-        char startFile = (persp == ChessGame.TeamColor.WHITE) ? 'a' : 'h';
-        char endFile = (persp == ChessGame.TeamColor.WHITE) ? 'h' : 'a' ;
-        int fileStep = (persp == ChessGame.TeamColor.WHITE) ? 1 : -1;
-
-        for (int rank = startRank; rank != endRank; rank += rankStep) {
-            // label rank
+        for (int rank : rankOrder) {
+            int rankNumber = rank + 1;
+            // left label rank
             stringBuilder.append(SET_TEXT_COLOR_BLUE).append(' ').append(RESET_TEXT_COLOR);
 
-            for (char file = startFile; file != endFile; file += fileStep) {
-                int fileIndex = file - 'a';
-                int rankIndex = rank - 1;
+            for (int file : fileOrder) {
 
-                boolean lightSquare = ((fileIndex +rank) % 2 == 0);
+                boolean lightSquare = ((file + rankNumber) % 2 == 0);
                 String bg = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
 
-                String cell = boardWhitePersp[rankIndex][fileIndex];
+                String cell = boardWhitePersp[rank][file];
                 if (cell == null) cell = EMPTY;
 
                 stringBuilder.append(cell).append(RESET_BG_COLOR);
             }
 
             // right rank label
-            stringBuilder.append(' ').append(SET_TEXT_COLOR_BLUE).append(rank).append(RESET_TEXT_COLOR).append('\n');
+            stringBuilder.append(' ').append(SET_TEXT_COLOR_BLUE).append(rankNumber).append(RESET_TEXT_COLOR).append('\n');
         }
         stringBuilder.append(filesHeader(persp)).append('\n');
 

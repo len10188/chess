@@ -11,10 +11,12 @@ public class PostLoginClient {
 
     private final List<GameData> lastListedGames = new ArrayList<>();
 
-    public PostLoginClient(String serverUrl, MessageHandler handler){
+    public PostLoginClient(String serverUrl, MessageHandler handler, String authToken){
         this.facade = new ServerFacade(serverUrl);
+        this.facade.authToken = authToken;
         this.handler = handler;
-        this.authToken = facade.authToken;
+        this.authToken = authToken;
+
     }
 
     public String welcome() {
@@ -44,6 +46,9 @@ public class PostLoginClient {
     private String listGames() throws Exception {
         try {
             var games = facade.listGames();
+            if (games == null) {
+                return "Could not list games. Try logging in again. ";
+            }
             lastListedGames.clear();
             lastListedGames.addAll(games);
 
@@ -69,8 +74,7 @@ public class PostLoginClient {
     private String createGame(String gameName) throws Exception {
         try {
             String createdGameName = facade.createGame(gameName);
-            if (createdGameName == null) return "Game creation failed.";
-            return "Created game: " + createdGameName;
+            return (createdGameName == null) ? "Game creation failed." :  "Created game: " + createdGameName;
         } catch (Exception e) {
             return "Create failed: " + e.getMessage();
         }
@@ -103,6 +107,15 @@ public class PostLoginClient {
             return "Observing game: \nBOARD\n" + board;
         } catch (Exception e) {
             return "Watch game failed: " + e.getMessage();
+        }
+    }
+
+    private String resetDatabase() {
+        try {
+            facade.clear(); // uses your existing ServerFacade.clear()
+            return "Database reset successful.";
+        } catch (Exception e) {
+            return "Reset failed: " + e.getMessage();
         }
     }
 
@@ -140,6 +153,8 @@ public class PostLoginClient {
                 }
                 yield watchGame(gameNum);
             }
+            case "reset" -> resetDatabase();
+
             default -> "Unknown command. Try 'help'.";
         };
     }

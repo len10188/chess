@@ -53,7 +53,7 @@ public class ReadEvalLoop implements MessageHandler {
     }
 
     private void runPostLogin(Scanner scanner, String authToken) {
-        PostLoginClient postLogin = new PostLoginClient(serverUrl, this);
+        PostLoginClient postLogin = new PostLoginClient(serverUrl, this, authToken);
 
         System.out.println(postLogin.welcome());
         System.out.println(postLogin.help());
