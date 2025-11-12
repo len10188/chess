@@ -15,11 +15,15 @@ public class ServerFacadeTests {
 
     private static Server server;
     private ServerFacade facade;
+    private static String baseUrl;
+
+
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
+        baseUrl = "http://localhost:" + port;
         System.out.println("Started test HTTP server on " + port);
     }
 
@@ -30,13 +34,26 @@ public class ServerFacadeTests {
 
     @BeforeEach
     void setup() throws Exception {
-        clearDb();
         facade = new ServerFacade(baseUrl);
+        facade.clear();
     }
 
+    // REGISTER
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
     }
+
+    // LOGIN
+
+    // LOGOUT
+
+    // CREATE GAME
+
+    // LIST GAME
+
+    //JOIN GAME
+
+    // CLEAR
 
 }

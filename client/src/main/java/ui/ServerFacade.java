@@ -120,4 +120,8 @@ public class ServerFacade {
             connection.disconnect();
         }
     }
+    public void clear() throws IOException, URISyntaxException {
+        String path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
 }
