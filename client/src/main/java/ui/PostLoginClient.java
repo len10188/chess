@@ -85,11 +85,9 @@ public class PostLoginClient {
             facade.joinGame(color, game.gameID());
 
             // draw board
-            if (color.equals("white")){
-                var board = DrawBoard.main(new chess.ChessGame(), ChessGame.TeamColor.WHITE);
-            } else {
-                var board = DrawBoard.main(new chess.ChessGame(), ChessGame.TeamColor.BLACK);
-            }
+            var board = DrawBoard.renderInitial(color.equals("white")
+                    ? chess.ChessGame.TeamColor.WHITE
+                    : chess.ChessGame.TeamColor.BLACK);
             return "Joined game as " + color + ":\nBOARD\n" + board;
         } catch (Exception e) {
             return "join failed: " + e.getMessage();
@@ -101,7 +99,7 @@ public class PostLoginClient {
         try {
             facade.joinGame(null, game.gameID());
 
-            var board = DrawBoard.main(new chess.ChessGame(), ChessGame.TeamColor.WHITE);
+            var board = DrawBoard.renderInitial(ChessGame.TeamColor.WHITE);
             return "Observing game: \nBOARD\n" + board;
         } catch (Exception e) {
             return "Watch game failed: " + e.getMessage();

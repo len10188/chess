@@ -53,7 +53,7 @@ public class ReadEvalLoop implements MessageHandler {
     }
 
     private void runPostLogin(Scanner scanner, String authToken) {
-        PostLoginClient postLogin = new PostLoginClient(serverUrl, this, authToken);
+        PostLoginClient postLogin = new PostLoginClient(serverUrl, this);
 
         System.out.println(postLogin.welcome());
         System.out.println(postLogin.help());
@@ -71,7 +71,7 @@ public class ReadEvalLoop implements MessageHandler {
 
                 if ("goodbye".equals(out)) {
                     System.out.println("Logged out.");
-                    state = State.LOGGED_OUT;
+                    state = UiState.LOGGED_OUT;
                     break;
                 }
                 // Postlogin needs to render board.
@@ -90,7 +90,7 @@ public class ReadEvalLoop implements MessageHandler {
 
     private void printPrompt() {
         String tag;
-        if (state == State.LOGGED_OUT) {
+        if (state == UiState.LOGGED_OUT) {
             tag = "[LOGGED OUT]";
         } else {
             tag = "[LOGGED IN]";
