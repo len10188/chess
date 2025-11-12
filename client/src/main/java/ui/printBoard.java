@@ -35,7 +35,7 @@ public class printBoard {
         return render(board, perspective);
     }
 
-    private static String render(ChessBoard board, ChessGame.TeamColor persp) {
+    public static String render(ChessBoard board, ChessGame.TeamColor persp) {
         StringBuilder stringBuilder = new StringBuilder();
 
         //Choose perspective
@@ -60,7 +60,7 @@ public class printBoard {
                 String bg = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
 
                 ChessPiece piece = board.getPiece(new ChessPosition(rankNumber, file + 1));
-                String glyph = (piece == null) ? EMPTY : pieceToGlyph;
+                String glyph = (piece == null) ? EMPTY : pieceToGlyph(piece);
 
 
 
