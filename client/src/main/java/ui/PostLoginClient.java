@@ -116,7 +116,7 @@ public class PostLoginClient {
         return switch (cmd) {
             case "help", "h" -> help();
             case "logout" -> logout();
-            case "quit", "q" -> "quit";
+            case "list", "l" -> listGames();
             case "create", "c" -> {
                 if (parts.length < 2) yield "Too few arguments provided. Usage: create <game_name>";
                 else if (parts.length > 2) yield  "Too many arguments provided. Usage: create <game_name>";

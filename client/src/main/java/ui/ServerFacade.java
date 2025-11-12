@@ -69,7 +69,10 @@ public class ServerFacade {
     public Collection<GameData> listGames() throws IOException, URISyntaxException {
         String path = "/game";
         var response = this.makeRequest("GET", path, null, ListGamesResult.class);
-        return response.games();
+        if (response != null) {
+            return response.games();
+        }
+        return null;
     }
 
     public void joinGame (String playerColor, int gameID) throws IOException, URISyntaxException {
