@@ -52,7 +52,7 @@ public class printBoard {
         for (int rank : rankOrder) {
             int rankNumber = rank + 1;
             // left label rank
-            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(" ").append(rankNumber).append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ").append(rankNumber).append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
 
             // make each column on board for the row.
             for (int file : fileOrder) {
