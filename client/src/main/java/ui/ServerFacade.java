@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 
+import service.ServiceException;
 import ui.request.JoinGameRequest;
 import ui.request.LoginRequest;
 import ui.request.RegisterRequest;
@@ -30,7 +31,7 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    public String register(String username, String password, String email) throws IOException, URISyntaxException {
+    public String register(String username, String password, String email) throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         var path = "/user";
         RegisterRequest request = new RegisterRequest(username, password, email);
         var response = this.makeRequest("POST", path, request, AuthData.class);
@@ -41,7 +42,7 @@ public class ServerFacade {
         return authToken;
     }
 
-    public String login(String username, String password) throws IOException, URISyntaxException {
+    public String login(String username, String password) throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         String path = "/session";
         LoginRequest request = new LoginRequest(username, password);
         var response = this.makeRequest("POST", path, request, AuthData.class);
@@ -52,7 +53,7 @@ public class ServerFacade {
         return authToken;
     }
 
-    public void logout() throws IOException, URISyntaxException {
+    public void logout() throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         if (authToken == null){
             throw new RuntimeException("You are not logged in.");
         }
@@ -61,7 +62,7 @@ public class ServerFacade {
         this.authToken = null;
     }
 
-    public String createGame(String gameName) throws IOException, URISyntaxException {
+    public String createGame(String gameName) throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         String path = "/game";
         CreateGameRequest request = new CreateGameRequest(gameName, authToken);
         var result = this.makeRequest("POST", path, request, CreateGameResult.class);
@@ -75,7 +76,7 @@ public class ServerFacade {
         }
     }
 
-    public Collection<GameData> listGames() throws IOException, URISyntaxException {
+    public Collection<GameData> listGames() throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         String path = "/game";
         var response = this.makeRequest("GET", path, null, ListGamesResult.class);
         if (response != null) {
@@ -86,12 +87,21 @@ public class ServerFacade {
 
     public boolean joinGame (String playerColor, int gameID) throws IOException, URISyntaxException {
         String path = "/game";
-        JoinGameRequest request = new JoinGameRequest(null, playerColor, gameID);
-        var result = this.makeRequest("PUT", path, request, null);
-        return result != null ;
+        JoinGameRequest request = new JoinGameRequest(playerColor, gameID);
+        Object result;
+        try {
+            result = this.makeRequest("PUT", path, request, null);
+        } catch (ServiceException.AlreadyTakenException e) {
+            System.out.println("Join failed. Color already taken.");
+            return false;
+        }
+        if (result == null) {
+            return true;
+        }
+        return false;
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws IOException, URISyntaxException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         URL url = (new URI(serverUrl + path)).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -111,17 +121,15 @@ public class ServerFacade {
         connection.connect();
         int status = connection.getResponseCode();
 
-
-        if (status < 200 || status >= 300){
+        if (status == 403){
+            connection.disconnect();
+            throw new ServiceException.AlreadyTakenException();
+        }else if (status < 200 || status >= 300){
             connection.disconnect();
             return null;
         }
 
-        if (responseClass == null) {
-            connection.disconnect();
-            //noinspection unchecked
-            return (T) Boolean.TRUE;
-        }
+
 
         try (InputStream bodyStream = connection.getInputStream();
         InputStreamReader reader = new InputStreamReader(bodyStream)) {
@@ -130,7 +138,7 @@ public class ServerFacade {
             connection.disconnect();
         }
     }
-    public void clear() throws IOException, URISyntaxException {
+    public void clear() throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         String path = "/db";
         this.makeRequest("DELETE", path, null, null);
     }

@@ -84,15 +84,20 @@ public class PostLoginClient {
             if (!color.equals("white") && !color.equals("black")) {
                 return "Color must be 'white' or 'black'.";
             }
-            facade.joinGame(color, game.gameID());
+            boolean result = facade.joinGame(color, game.gameID());
 
-            // draw board
-            var board = PrintBoard.render(game.game().getBoard(), color.equals("white")
-                    ? chess.ChessGame.TeamColor.WHITE
-                    : chess.ChessGame.TeamColor.BLACK);
-            return "Joined game as " + color + ":\n            CHESS BOARD\n" + board;
+            if (result){
+                // draw board
+                var board = PrintBoard.render(game.game().getBoard(), color.equals("white")
+                        ? chess.ChessGame.TeamColor.WHITE
+                        : chess.ChessGame.TeamColor.BLACK);
+                return "Joined game as " + color + ":\n            CHESS BOARD\n" + board;
+            } else {
+                return "";
+            }
+
         } catch (Exception e) {
-            return "join failed: " + e.getMessage();
+            return "Join failed: " + e.getMessage();
         }
     }
 
@@ -143,10 +148,10 @@ public class PostLoginClient {
             }
             case "join", "j" -> {
                 if (parts.length < 3 ) {
-                    yield "Too few arguments provided. Usage: join <number> <while|black>";
+                    yield "Too few arguments provided. Usage: join <number> <white|black>";
                 }
                 if (parts.length > 3 ) {
-                    yield "Too many arguments provided. Usage: join <number> <while|black>";
+                    yield "Too many arguments provided. Usage: join <number> <white|black>";
                 }
                 int gameNum = parseInt(parts[1]);
                 if (gameNum < 1 || gameNum > lastListedGames.size()) {
