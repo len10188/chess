@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
 import model.GameData;
+import ui.ServiceException;
 
 import java.util.Collection;
 
@@ -46,8 +47,9 @@ public class ServerFacadeTests {
     @Test
     public void registerNegative() throws Exception {
         facade.register("laura", "password", "email@byu.edu");
-        String token2 = facade.register("laura", "password", "email2@byu.edu");
-        assertNull(token2, "registering duplicate should produce null token (fail).");
+        assertThrows(ServiceException.AlreadyTakenException.class, () -> {
+                    facade.register("laura", "password", "email2@byu.edu");
+                });
     }
 
     // LOGIN
