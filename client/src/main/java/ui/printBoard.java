@@ -52,8 +52,9 @@ public class printBoard {
         for (int rank : rankOrder) {
             int rankNumber = rank + 1;
             // left label rank
-            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ").append(QUARTER_SPACE).append(rankNumber).append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(" ").append(rankNumber).append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
 
+            // make each column on board for the row.
             for (int file : fileOrder) {
 
                 boolean lightSquare = ((file + rankNumber) % 2 == 0);
@@ -88,7 +89,7 @@ public class printBoard {
                 stringBuilder.append(HALF_SPACE).append(center(String.valueOf(file), CELL_W));
             }
         }
-        stringBuilder.append("  ").append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+        stringBuilder.append("   ").append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         return stringBuilder.toString();
     }
 
