@@ -23,7 +23,9 @@ public class ReadEvalLoop implements MessageHandler {
             while (true) {
                 printPrompt();
                 String line = readLine(scanner);
-                if (line == null) break; // EOF reached.
+                if (line == null){
+                    break; // EOF reached.
+                }
 
                 try {
                     String result = preLogin.eval(line);
@@ -62,7 +64,9 @@ public class ReadEvalLoop implements MessageHandler {
         while (state == UiState.LOGGED_IN) {
             printPrompt();
             String line = readLine(scanner);
-            if (line == null) break;
+            if (line == null) {
+                break;
+            }
 
             try {
                 String out = postLogin.eval(line);

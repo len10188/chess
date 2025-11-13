@@ -27,12 +27,6 @@ public class PrintBoard {
 
     private static final int CELL_W = 4;
 
-    public static String renderInitial(ChessGame.TeamColor perspective) {
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        return render(board, perspective);
-    }
-
     public static String render(ChessBoard board, ChessGame.TeamColor persp) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -98,11 +92,6 @@ public class PrintBoard {
         return stringBuilder.toString();
     }
 
-    private static String[] fillRow(String piece) {
-        String[] row = new String[8];
-        for (int i = 0; i < 8; i++) row[i] = (piece == null) ? null : piece;
-        return row;
-    }
 
     public static String center (String s, int width) {
 
