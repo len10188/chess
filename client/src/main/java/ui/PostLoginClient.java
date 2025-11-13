@@ -57,10 +57,9 @@ public class PostLoginClient {
             int i = 1;
             for (var g : games) {
                 stringBuilder.append(String.format(
-                        "%d. Name: %s, Id: %d, (white: %s | black: %s)%n",
+                        "%d. Name: %s, (white: %s | black: %s)%n",
                         i++,
                         g.gameName(),
-                        g.gameID(),
                         showPlayer(g.whiteUsername()),
                         showPlayer(g.blackUsername())
 
@@ -105,7 +104,7 @@ public class PostLoginClient {
             }
 
         } catch (Exception e) {
-            return "TEST Join failed: " + e.getClass().getSimpleName();
+            return "Join failed: " + e.getClass().getSimpleName();
         }
     }
 

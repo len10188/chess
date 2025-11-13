@@ -49,7 +49,7 @@ public class ReadEvalLoop implements MessageHandler {
                         System.out.println(result);
                     }
                 } catch (Throwable t) {
-                    System.out.println("Error: " + t.getMessage());
+                    System.out.println("Error: " + t.getClass().getSimpleName());
                 }
             }
         }
@@ -88,7 +88,7 @@ public class ReadEvalLoop implements MessageHandler {
                 // everything else
                 System.out.println(out);
             } catch (Throwable t) {
-                System.out.println("Error: " + t.getMessage());
+                System.out.println("Error: " + t.getClass().getSimpleName());
             }
         }
     }

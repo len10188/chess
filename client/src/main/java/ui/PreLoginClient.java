@@ -1,5 +1,7 @@
 package ui;
 
+import ui.ServiceException.AlreadyTakenException;
+
 public class PreLoginClient {
     private final ServerFacade facade;
     private final String serverUrl;
@@ -37,12 +39,15 @@ public class PreLoginClient {
                 if (parts.length < 4) {
                     yield "Usage: register <username> <password> <email>";
                 }
-                var token = facade.register(parts[1], parts[2], parts[3]);
-                if (token != null) {
-                    yield "success!\n" + token;
-                } else {
+                try {
+                    var token = facade.register(parts[1], parts[2], parts[3]);
+                    if (token != null) {
+                        yield "success!\n" + token;
+                    }
+                } catch (AlreadyTakenException e) {
                     yield "Username taken please try again.";
                 }
+                yield "Error occurred please try again.";
             }
             case "login", "l" -> {
                 if (parts.length < 3) {
