@@ -88,7 +88,7 @@ public class PostLoginClient {
             var board = DrawBoard.renderInitial(color.equals("white")
                     ? chess.ChessGame.TeamColor.WHITE
                     : chess.ChessGame.TeamColor.BLACK);
-            return "Joined game as " + color + ":\nBOARD\n" + board;
+            return "Joined game as " + color + ":\n            CHESS BOARD\n" + board;
         } catch (Exception e) {
             return "join failed: " + e.getMessage();
         }
@@ -100,7 +100,7 @@ public class PostLoginClient {
             facade.joinGame(null, game.gameID());
 
             var board = printBoard.render(game.game().getBoard(), ChessGame.TeamColor.WHITE);
-            return "Observing game: \nBOARD\n" + board;
+            return "Observing game: \n            CHESS BOARD\n" + board;
         } catch (Exception e) {
             return "Watch game failed: " + e.getMessage();
         }

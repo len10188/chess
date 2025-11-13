@@ -35,18 +35,18 @@ public class PreLoginClient {
                 if (parts.length < 4) yield "Usage: register <username> <password> <email>";
                 var token = facade.register(parts[1], parts[2], parts[3]);
                 if (token != null) {
-                    yield "success\n" + token;
+                    yield "success!\n" + token;
                 } else {
-                    yield "Registration failed.";
+                    yield "Username taken please try again.";
                 }
             }
             case "login", "l" -> {
                 if (parts.length < 3) yield "Usage: login <username> <password>";
                 var token = facade.login(parts[1], parts[2]);
                 if (token != null && !token.isBlank()) {
-                    yield "success\n" + token;
+                    yield "success!\n" + token;
                 } else {
-                    yield "Login failed.";
+                    yield "Login failed. Please try again.";
                 }
             }
             default -> "Unknown command. Try 'help'.";

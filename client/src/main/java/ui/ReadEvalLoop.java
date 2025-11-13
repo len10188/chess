@@ -35,8 +35,8 @@ public class ReadEvalLoop implements MessageHandler {
                     }
 
                     // LOGIN or REGISTER successful -> go to post login
-                    if (result != null && result.startsWith("success\n")){
-                        String token = result.substring("success\n".length());
+                    if (result != null && result.startsWith("success!\n")){
+                        String token = result.substring("success!\n".length());
                         state = UiState.LOGGED_IN;
                         runPostLogin(scanner, token);
                         continue;
@@ -76,7 +76,7 @@ public class ReadEvalLoop implements MessageHandler {
                     break;
                 }
                 // Postlogin needs to render board.
-                if (out.startsWith("BOARD\n")) {
+                if (out.startsWith("BOARD")) {
                     System.out.println(out.substring("BOARD\n".length()));
                     continue;
                 }
