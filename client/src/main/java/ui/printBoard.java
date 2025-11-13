@@ -15,9 +15,7 @@ import static ui.EscapeSequences.BLACK_ROOK;
 import static ui.EscapeSequences.EMPTY;
 import static ui.EscapeSequences.RESET_BG_COLOR;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
-import static ui.EscapeSequences.SET_BG_COLOR_DARK_GREY;
 import static ui.EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 import static ui.EscapeSequences.WHITE_BISHOP;
 import static ui.EscapeSequences.WHITE_KING;
 import static ui.EscapeSequences.WHITE_KNIGHT;
@@ -52,7 +50,10 @@ public class printBoard {
         for (int rank : rankOrder) {
             int rankNumber = rank + 1;
             // left label rank
-            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ").append(rankNumber).append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ")
+                    .append(rankNumber)
+                    .append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE)
+                    .append(RESET_TEXT_COLOR).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
 
             // make each column on board for the row.
             for (int file : fileOrder) {
@@ -65,11 +66,15 @@ public class printBoard {
 
 
 
-                stringBuilder.append(bg).append(SET_TEXT_COLOR_BLACK).append(glyph).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+                stringBuilder.append(bg).append(SET_TEXT_COLOR_BLACK).append(glyph).
+                        append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
             }
 
             // right rank label
-            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ").append(QUARTER_SPACE).append(rankNumber).append(" ").append(LITTLE_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR).append(RESET_BG_COLOR).append('\n');
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ")
+                    .append(QUARTER_SPACE).append(rankNumber)
+                    .append(" ").append(LITTLE_SPACE).append(LITTLE_SPACE).append(RESET_TEXT_COLOR)
+                    .append(RESET_BG_COLOR).append('\n');
         }
         // bottom file footer
         stringBuilder.append(filesHeader(persp)).append('\n');
