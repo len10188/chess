@@ -21,11 +21,11 @@ public class PreLoginClient {
 
     public String help() {
         return """
-        Commands:
-         - register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-         - login <USERNAME> <PASSWORD> - to play chess
-         - quit - playing chess
-         - help - with possible commands
+        Options:
+         Register a new user: 'r', 'register' <USERNAME> <PASSWORD> <EMAIL>
+         Login as an existing user: 'l', 'login' <USERNAME> <PASSWORD> 
+         Exit the program: 'q', 'quit'
+         Print this message: 'h', 'help'
         """;
     }
 
@@ -35,9 +35,9 @@ public class PreLoginClient {
         var cmd = parts[0].toLowerCase();
 
         return switch (cmd) {
-            case "help" -> help();
-            case "quit" -> "quit";
-            case "register" -> {
+            case "help", "h" -> help();
+            case "quit", "q" -> "quit";
+            case "register", "r" -> {
                 if (parts.length < 4) yield "Usage: register <username> <password> <email>";
                 var token = facade.register(parts[1], parts[2], parts[3]);
                 if (token != null) {
@@ -46,7 +46,7 @@ public class PreLoginClient {
                     yield "Registration failed.";
                 }
             }
-            case "login" -> {
+            case "login", "l" -> {
                 if (parts.length < 3) yield "Usage: login <username> <password>";
                 var token = facade.login(parts[1], parts[2]);
                 if (token != null && !token.isBlank()) {
