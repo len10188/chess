@@ -117,7 +117,6 @@ public class ServerFacade {
             return null;
         }
 
-
         if (responseClass == null) {
             connection.disconnect();
             //noinspection unchecked
