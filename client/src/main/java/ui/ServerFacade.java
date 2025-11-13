@@ -22,7 +22,7 @@ import java.util.Collection;
 
 public class ServerFacade {
     String serverUrl;
-    String authToken;
+    public String authToken;
     private final Gson gson = new Gson();
 
     public ServerFacade(String url) {

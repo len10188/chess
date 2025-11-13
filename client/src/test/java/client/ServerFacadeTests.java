@@ -176,6 +176,43 @@ public class ServerFacadeTests {
                 "white seat should remain with the first player after second attempt");
     }
     // CLEAR
+    @Test
+    void clear_positive_wipesDataAndInvalidatesToken() throws Exception {
+        ServerFacade f = new ServerFacade(baseUrl);
+
+        // Create data
+        String t1 = f.register("test1", "pw", "test@email.com");
+        String g = f.createGame("G1");
+
+        // clear the DB
+        assertDoesNotThrow(f::clear, "clear() should not throw");
+
+        // Old token should now be invalid -> any authed call should fail (return null)
+        var gamesAfter = f.listGames();
+        assertNull(gamesAfter, "old auth token should be invalid after clear()");
+
+        // You can register the same username again because DB is wiped
+        f.authToken = null; // ensure no stale header on /user
+        String t2 = f.register("test1", "pw", "test@email.com");
+        assertNotNull(t2, "re-registering same username should succeed after clear()");
+    }
+
+    @Test
+    void clear_negative_previousUserCannotLoginAfterClear() throws Exception {
+        ServerFacade f = new ServerFacade(baseUrl);
+
+        // Create data
+        assertNotNull(f.register("test1", "pw", "b@email.com"));
+        assertNotNull(f.createGame("G2"));
+
+        // Clear DB
+        assertDoesNotThrow(f::clear);
+
+        // Now the old user should no longer exist -> login should fail
+        f.authToken = null; // login should not send any (now-invalid) header
+        String token = f.login("test1", "pw");
+        assertNull(token, "login for a user created before clear() should fail");
+    }
 
 }
 

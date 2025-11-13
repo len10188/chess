@@ -85,7 +85,7 @@ public class PostLoginClient {
             facade.joinGame(color, game.gameID());
 
             // draw board
-            var board = DrawBoard.renderInitial(color.equals("white")
+            var board = printBoard.render(game.game().getBoard(), color.equals("white")
                     ? chess.ChessGame.TeamColor.WHITE
                     : chess.ChessGame.TeamColor.BLACK);
             return "Joined game as " + color + ":\n            CHESS BOARD\n" + board;
@@ -115,7 +115,7 @@ public class PostLoginClient {
         }
     }
 
-    public String eval(String input) throws Exception {
+    public String eval(String input){
         if (input == null || input.isBlank()) return "";
 
         var parts = input.split("\\s+");
