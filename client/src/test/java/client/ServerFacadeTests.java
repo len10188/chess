@@ -73,7 +73,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logoutNegative_notLoggedIn() {
+    public void logoutNegativeNotLoggedIn() {
         RuntimeException ex = assertThrows(RuntimeException.class, () -> facade.logout(),
                 "logout without login should throw");
         assertTrue(ex.getMessage().toLowerCase().contains("not logged in"));
@@ -105,7 +105,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void listGamesNegative_notLoggedIn() throws Exception {
+    void listGamesNegativeNotLoggedIn() throws Exception {
         Collection<GameData> games = facade.listGames();
         // Your facade returns null if response was null / error
         assertNull(games, "listGames when not logged in should return null");
@@ -140,7 +140,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void joinGameNegative_alreadyTaken() throws Exception {
+    void joinGameNegativeAlreadyTaken() throws Exception {
         // user1 creates game and takes white
         ServerFacade f1 = new ServerFacade(baseUrl);
         f1.register("player1", "password", "p1@email.com");
@@ -177,7 +177,7 @@ public class ServerFacadeTests {
     }
     // CLEAR
     @Test
-    void clear_positive_wipesDataAndInvalidatesToken() throws Exception {
+    void clearPositiveWipesData() throws Exception {
         ServerFacade f = new ServerFacade(baseUrl);
 
         // Create data
@@ -198,7 +198,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void clear_negative_previousUserCannotLoginAfterClear() throws Exception {
+    void clearNegativePreviousUserCannotLoginAfterClear() throws Exception {
         ServerFacade f = new ServerFacade(baseUrl);
 
         // Create data

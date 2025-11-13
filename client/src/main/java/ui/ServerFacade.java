@@ -65,7 +65,9 @@ public class ServerFacade {
         String path = "/game";
         CreateGameRequest request = new CreateGameRequest(gameName, authToken);
         var result = this.makeRequest("POST", path, request, CreateGameResult.class);
-        if (result == null) return null;
+        if (result == null) {
+            return null;
+        }
         if (result.gameID() < 1) {
             return null; // create failed.
         } else {

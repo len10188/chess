@@ -25,14 +25,18 @@ public class PreLoginClient {
 
     public String eval(String input) throws Exception {
         var parts = input.split("\\s+");
-        if (parts.length == 0) return "";
+        if (parts.length == 0) {
+            return "";
+        }
         var cmd = parts[0].toLowerCase();
 
         return switch (cmd) {
             case "help", "h" -> help();
             case "quit", "q" -> "quit";
             case "register", "r" -> {
-                if (parts.length < 4) yield "Usage: register <username> <password> <email>";
+                if (parts.length < 4) {
+                    yield "Usage: register <username> <password> <email>";
+                }
                 var token = facade.register(parts[1], parts[2], parts[3]);
                 if (token != null) {
                     yield "success!\n" + token;
@@ -41,7 +45,9 @@ public class PreLoginClient {
                 }
             }
             case "login", "l" -> {
-                if (parts.length < 3) yield "Usage: login <username> <password>";
+                if (parts.length < 3) {
+                    yield "Usage: login <username> <password>";
+                }
                 var token = facade.login(parts[1], parts[2]);
                 if (token != null && !token.isBlank()) {
                     yield "success!\n" + token;

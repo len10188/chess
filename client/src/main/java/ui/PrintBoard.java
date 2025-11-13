@@ -23,7 +23,7 @@ import static ui.EscapeSequences.WHITE_PAWN;
 import static ui.EscapeSequences.WHITE_QUEEN;
 import static ui.EscapeSequences.WHITE_ROOK;
 
-public class printBoard {
+public class PrintBoard {
 
     private static final int CELL_W = 4;
 

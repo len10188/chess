@@ -48,7 +48,9 @@ public class PostLoginClient {
             lastListedGames.clear();
             lastListedGames.addAll(games);
 
-            if (games.isEmpty()) return "No games found. Try making one!";
+            if (games.isEmpty()){
+                return "No games found. Try making one!";
+            }
 
             StringBuilder stringBuilder = new StringBuilder("Games: \n");
             int i = 1;
@@ -85,7 +87,7 @@ public class PostLoginClient {
             facade.joinGame(color, game.gameID());
 
             // draw board
-            var board = printBoard.render(game.game().getBoard(), color.equals("white")
+            var board = PrintBoard.render(game.game().getBoard(), color.equals("white")
                     ? chess.ChessGame.TeamColor.WHITE
                     : chess.ChessGame.TeamColor.BLACK);
             return "Joined game as " + color + ":\n            CHESS BOARD\n" + board;
@@ -99,7 +101,7 @@ public class PostLoginClient {
         try {
             facade.joinGame(null, game.gameID());
 
-            var board = printBoard.render(game.game().getBoard(), ChessGame.TeamColor.WHITE);
+            var board = PrintBoard.render(game.game().getBoard(), ChessGame.TeamColor.WHITE);
             return "Observing game: \n            CHESS BOARD\n" + board;
         } catch (Exception e) {
             return "Watch game failed: " + e.getMessage();
@@ -116,10 +118,14 @@ public class PostLoginClient {
     }
 
     public String eval(String input){
-        if (input == null || input.isBlank()) return "";
+        if (input == null || input.isBlank()) {
+            return "";
+        }
 
         var parts = input.split("\\s+");
-        if (parts.length == 0) return "";
+        if (parts.length == 0) {
+            return "";
+        }
         var cmd = parts[0].toLowerCase(); // allow for capital letters
 
         return switch (cmd) {
@@ -127,13 +133,21 @@ public class PostLoginClient {
             case "logout" -> logout();
             case "list", "l" -> listGames();
             case "create", "c" -> {
-                if (parts.length < 2) yield "Too few arguments provided. Usage: create <game_name>";
-                else if (parts.length > 2) yield  "Too many arguments provided. Usage: create <game_name>";
+                if (parts.length < 2){
+                    yield "Too few arguments provided. Usage: create <game_name>";
+                }
+                else if (parts.length > 2) {
+                    yield  "Too many arguments provided. Usage: create <game_name>";
+                }
                 yield createGame(parts[1]);
             }
             case "join", "j" -> {
-                if (parts.length < 3 ) yield "Too few arguments provided. Usage: join <number> <while|black>";
-                if (parts.length > 3 ) yield "Too many arguments provided. Usage: join <number> <while|black>";
+                if (parts.length < 3 ) {
+                    yield "Too few arguments provided. Usage: join <number> <while|black>";
+                }
+                if (parts.length > 3 ) {
+                    yield "Too many arguments provided. Usage: join <number> <while|black>";
+                }
                 int gameNum = parseInt(parts[1]);
                 if (gameNum < 1 || gameNum > lastListedGames.size()) {
                     yield "Invalid game number. Use 'list' to see games.";
@@ -142,7 +156,9 @@ public class PostLoginClient {
                 yield playGame(gameNum, color);
             }
             case "watch", "w" -> {
-                if (parts.length < 2) yield "Too few arguments provided. Usage: watch <number>";
+                if (parts.length < 2){
+                    yield "Too few arguments provided. Usage: watch <number>";
+                }
                 int gameNum = parseInt(parts[1]);
                 if (gameNum < 1 || gameNum > lastListedGames.size()) {
                     yield "Invalid game number. Use 'list' to see games.";
