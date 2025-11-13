@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -8,7 +7,6 @@ import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
-import result.JoinGameResult;
 import result.CreateGameResult;
 import result.ListGamesResult;
 

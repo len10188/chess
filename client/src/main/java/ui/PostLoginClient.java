@@ -6,16 +6,12 @@ import java.util.*;
 
 public class PostLoginClient {
     private final ServerFacade facade;
-    private final MessageHandler handler;
-    private String authToken;
 
     private final List<GameData> lastListedGames = new ArrayList<>();
 
     public PostLoginClient(String serverUrl, MessageHandler handler, String authToken){
         this.facade = new ServerFacade(serverUrl);
         this.facade.authToken = authToken;
-        this.handler = handler;
-        this.authToken = authToken;
 
     }
 
@@ -34,7 +30,7 @@ public class PostLoginClient {
         """;
     }
 
-    public String logout() throws Exception {
+    public String logout()  {
         try {
             facade.logout();
             return "goodbye";
@@ -43,7 +39,7 @@ public class PostLoginClient {
         }
     }
 
-    private String listGames() throws Exception {
+    private String listGames() {
         try {
             var games = facade.listGames();
             if (games == null) {
@@ -71,7 +67,7 @@ public class PostLoginClient {
         }
     }
 
-    private String createGame(String gameName) throws Exception {
+    private String createGame(String gameName) {
         try {
             String createdGameName = facade.createGame(gameName);
             return (createdGameName == null) ? "Game creation failed." :  "Created game: " + createdGameName;
@@ -80,7 +76,7 @@ public class PostLoginClient {
         }
     }
 
-    private String playGame (int gameIdNum, String color) throws Exception {
+    private String playGame (int gameIdNum, String color) {
         var game = lastListedGames.get(gameIdNum - 1);
         try {
             if (!color.equals("white") && !color.equals("black")) {
@@ -98,7 +94,7 @@ public class PostLoginClient {
         }
     }
 
-    private String watchGame(int gameIdNum) throws Exception {
+    private String watchGame(int gameIdNum) {
         var game = lastListedGames.get(gameIdNum - 1);
         try {
             facade.joinGame(null, game.gameID());

@@ -1,5 +1,4 @@
 import chess.*;
-import ui.DrawBoard;
 import ui.printBoard;
 
 public class printTest {

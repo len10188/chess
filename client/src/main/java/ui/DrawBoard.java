@@ -10,7 +10,6 @@ public class DrawBoard {
     private DrawBoard() {}
 
     private static final int CELL_W = 4;
-    private static final String EMPTY_PIECE = " ";
 
     public static String renderInitial(ChessGame.TeamColor perspective) {
 
@@ -107,8 +106,9 @@ public class DrawBoard {
     }
 
     public static String center (String s, int width) {
-
+        int i = width + 1;
         return (" " + s + " ");
     }
+
 
 }

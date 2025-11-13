@@ -2,19 +2,13 @@ package ui;
 
 public class PreLoginClient {
     private final ServerFacade facade;
-    private final MessageHandler handler;
     private final String serverUrl;
 
     public PreLoginClient(String serverUrl, MessageHandler handler){
         this.facade = new ServerFacade(serverUrl);
-        this.handler = handler;
         this.serverUrl = serverUrl;
 
     }
-    public String getServerUrl() {
-        return serverUrl;
-    }
-
     public String welcome() {
         return "Welcome to Chess!";
     }
@@ -23,7 +17,7 @@ public class PreLoginClient {
         return """
         Options:
          Register a new user: 'r', 'register' <USERNAME> <PASSWORD> <EMAIL>
-         Login as an existing user: 'l', 'login' <USERNAME> <PASSWORD> 
+         Login as an existing user: 'l', 'login' <USERNAME> <PASSWORD>
          Exit the program: 'q', 'quit'
          Print this message: 'h', 'help'
         """;
