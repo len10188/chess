@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import model.GameData;
 import java.util.*;
@@ -56,11 +57,13 @@ public class PostLoginClient {
             int i = 1;
             for (var g : games) {
                 stringBuilder.append(String.format(
-                        "%d. %s (white: %s, black: %s)%n",
+                        "%d. Name: %s, Id: %d, (white: %s | black: %s)%n",
                         i++,
                         g.gameName(),
+                        g.gameID(),
                         showPlayer(g.whiteUsername()),
                         showPlayer(g.blackUsername())
+
                 ));
             }
             return stringBuilder.toString();
@@ -81,23 +84,28 @@ public class PostLoginClient {
     private String playGame (int gameIdNum, String color) {
         var game = lastListedGames.get(gameIdNum - 1);
         try {
-            if (!color.equals("white") && !color.equals("black")) {
+            if (!color.equalsIgnoreCase("white") && !color.equalsIgnoreCase("black")) {
                 return "Color must be 'white' or 'black'.";
             }
             boolean result = facade.joinGame(color, game.gameID());
-
+            //System.out.println("DEBUG: result: " + result);
             if (result){
                 // draw board
-                var board = PrintBoard.render(game.game().getBoard(), color.equals("white")
-                        ? chess.ChessGame.TeamColor.WHITE
-                        : chess.ChessGame.TeamColor.BLACK);
+                var persp = color.equals("white")
+                        ? ChessGame.TeamColor.WHITE
+                        : ChessGame.TeamColor.BLACK;
+
+                chess.ChessBoard realBoard = new ChessBoard();
+                realBoard.resetBoard();
+
+                var board = PrintBoard.render(realBoard,persp);
                 return "Joined game as " + color + ":\n            CHESS BOARD\n" + board;
             } else {
                 return "";
             }
 
         } catch (Exception e) {
-            return "Join failed: " + e.getMessage();
+            return "TEST Join failed: " + e.getClass().getSimpleName();
         }
     }
 

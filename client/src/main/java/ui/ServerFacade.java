@@ -91,14 +91,11 @@ public class ServerFacade {
         Object result;
         try {
             result = this.makeRequest("PUT", path, request, null);
+            return result == null; // success
         } catch (ServiceException.AlreadyTakenException e) {
             System.out.println("Join failed. Color already taken.");
             return false;
         }
-        if (result == null) {
-            return true;
-        }
-        return false;
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
@@ -118,6 +115,7 @@ public class ServerFacade {
                 output.write(json.getBytes());
             }
         }
+
         connection.connect();
         int status = connection.getResponseCode();
 
@@ -126,10 +124,13 @@ public class ServerFacade {
             throw new ServiceException.AlreadyTakenException();
         }else if (status < 200 || status >= 300){
             connection.disconnect();
-            return null;
+            return null; // failure
         }
 
-
+        if (responseClass == null) {
+            connection.disconnect();
+            return null; // success no payload
+        }
 
         try (InputStream bodyStream = connection.getInputStream();
         InputStreamReader reader = new InputStreamReader(bodyStream)) {
