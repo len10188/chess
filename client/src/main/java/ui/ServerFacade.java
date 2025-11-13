@@ -30,7 +30,8 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    public String register(String username, String password, String email) throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
+    public String register(String username, String password, String email)
+            throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         var path = "/user";
         RegisterRequest request = new RegisterRequest(username, password, email);
         var response = this.makeRequest("POST", path, request, AuthData.class);
@@ -97,7 +98,8 @@ public class ServerFacade {
         }
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
+            throws IOException, URISyntaxException, ServiceException.AlreadyTakenException {
         URL url = (new URI(serverUrl + path)).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
