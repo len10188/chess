@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 
-import service.ServiceException;
 import ui.request.JoinGameRequest;
 import ui.request.LoginRequest;
 import ui.request.RegisterRequest;
@@ -143,4 +142,6 @@ public class ServerFacade {
         String path = "/db";
         this.makeRequest("DELETE", path, null, null);
     }
+
+
 }
