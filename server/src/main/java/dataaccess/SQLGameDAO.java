@@ -158,4 +158,23 @@ public class SQLGameDAO implements GameDAO {
             throw new DataAccessException("Error clearing games: " + e.getMessage());
         }
     }
+
+    @Override
+    public void updateGame(int id, ChessGame game) throws DataAccessException {
+        String sql = "UPDATE games SET game = ? WHERE gameID = ?";
+        String json = gson.toJson(game);
+
+        try (Connection conn = DatabaseManager.getConnection();
+            var statement = conn.prepareStatement(sql)) {
+
+            statement.setString(1, json);
+            statement.setInt(2, id);
+             int rows = statement.executeUpdate();
+             if (rows == 0){
+                 throw new DataAccessException("Game not found");
+             }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating game: " + e.getMessage());
+        }
+    }
 }

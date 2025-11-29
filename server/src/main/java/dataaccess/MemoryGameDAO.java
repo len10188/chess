@@ -79,4 +79,22 @@ public class MemoryGameDAO implements GameDAO{
         gamesList.clear();
         nextId.set(1);
     }
+
+    @Override
+    public void updateGame(int id, ChessGame game) throws DataAccessException {
+        GameData oldGame = gamesList.get(id);
+        if (oldGame == null) {
+            throw new DataAccessException("Game with ID " + id + " doesn't exist");
+        }
+
+        GameData updateGame = new GameData(
+                oldGame.gameID(),
+                oldGame.whiteUsername(),
+                oldGame.blackUsername(),
+                oldGame.gameName(),
+                game
+        );
+
+        gamesList.put(id, updateGame);
+    }
 }
