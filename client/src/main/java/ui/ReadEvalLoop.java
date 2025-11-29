@@ -6,7 +6,7 @@ public class ReadEvalLoop implements MessageHandler {
     private final String serverUrl;
     private final PreLoginClient preLogin;
 
-    private enum UiState {LOGGED_OUT, LOGGED_IN}
+    private enum UiState {LOGGED_OUT, LOGGED_IN, IN_GAME}
     private UiState state = UiState.LOGGED_OUT;
 
 
@@ -95,10 +95,11 @@ public class ReadEvalLoop implements MessageHandler {
 
     private void printPrompt() {
         String tag;
-        if (state == UiState.LOGGED_OUT) {
-            tag = "[LOGGED OUT]";
-        } else {
-            tag = "[LOGGED IN]";
+        switch(state){
+            case LOGGED_IN -> tag = "[LOGGED IN]";
+            case LOGGED_OUT -> tag = "[LOGGED OUT]";
+            case IN_GAME -> tag = "[IN GAME]";
+            default -> tag =  "[ERROR IN GAME STATE]";
         }
         System.out.println(tag +" >>> ");
     }
