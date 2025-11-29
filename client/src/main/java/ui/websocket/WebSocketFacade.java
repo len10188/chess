@@ -27,7 +27,7 @@ public class WebSocketFacade {
     private final Consumer<ErrorMessage> onError;
 
     public WebSocketFacade(
-            String webSocketUrl,
+            String serverUrl,
             String authToken,
             int gameID,
             Consumer<LoadGameMessage> onLoadGame,
@@ -39,6 +39,8 @@ public class WebSocketFacade {
         this.onLoadGame = onLoadGame;
         this.onNotification = onNotification;
         this.onError = onError;
+
+        String webSocketUrl = serverUrl.replaceFirst("^http", "ws") + "/connect";
 
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         container.connectToServer(this, URI.create(webSocketUrl));

@@ -199,4 +199,11 @@ public class PostLoginClient {
             return name;
         }
     }
+    public List<GameData> getLastListedGames() {
+        return lastListedGames;
+    }
+
+    public ServerFacade getFacade() {
+        return facade;
+    }
 }

@@ -1,7 +1,6 @@
 package ui;
 
 import chess.*;
-import io.javalin.http.HttpResponseException;
 import ui.websocket.ServerMessageHandler;
 import ui.websocket.WebSocketFacade;
 import websocket.messages.ErrorMessage;
@@ -10,7 +9,6 @@ import websocket.messages.NotificationMessage;
 
 public class InGameClient implements ServerMessageHandler {
 
-    private final ServerFacade facade;
     private final WebSocketFacade webSocket;
 
     private final String authToken;
@@ -27,10 +25,17 @@ public class InGameClient implements ServerMessageHandler {
         this.gameID = gameID;
         this.perspective = perspective;
 
-        this.facade = new ServerFacade(serverUrl);
-        this.facade.authToken = authToken;
+        ServerFacade facade = new ServerFacade(serverUrl);
+        facade.authToken = authToken;
 
-        this.webSocket = new WebSocketFacade(serverUrl);
+        this.webSocket = new WebSocketFacade(
+                serverUrl,
+                authToken,
+                gameID,
+                this::handleLoadGame,
+                this::handleNotification,
+                this::handleError
+        );
     }
 
     public String help() {
@@ -92,7 +97,7 @@ public class InGameClient implements ServerMessageHandler {
         return "CHESS BOARD\n" + board;
     }
 
-    private String makeMove(String from, String to, String promotion) {
+    private String makeMove(String from, String to, String promotionName) {
         if (currentGame == null) {
             return "No game loaded yet.";
         }
@@ -101,9 +106,9 @@ public class InGameClient implements ServerMessageHandler {
             ChessPosition start = parsePosition(from);
             ChessPosition end = parsePosition(to);
 
-            ChessPiece promotionPiece = null;
-            if (promotion != null){
-                promotionPiece = switch (promotion.toLowerCase()) {
+            ChessPiece.PieceType promotionPiece = null;
+            if (promotionName != null){
+                promotionPiece = switch (promotionName.toLowerCase()) {
                     case "q" -> ChessPiece.PieceType.QUEEN;
                     case "r" -> ChessPiece.PieceType.ROOK;
                     case "b" -> ChessPiece.PieceType.BISHOP;
@@ -112,22 +117,62 @@ public class InGameClient implements ServerMessageHandler {
                 };
             }
 
-            ChessMove move = new ChessMove(start, end, promotionPiece)
-        };
+            ChessMove move = new ChessMove(start, end, promotionPiece);
+
+            webSocket.sendMove(move);
+            if (promotionPiece == null) {
+                return "Move made: " + from + " -> "+ to;
+            } else {
+                return "Move made: " + from + " -> "+ to + "promoting to " + promotionPiece;
+            }
+        } catch (IllegalArgumentException e) {
+            return "Invalid square given. Example: a1, e7, etc.";
+        }
+    }
+
+    private String leave() {
+        webSocket.sendLeave();
+        return "Leaving game. Returning to lobby...";
+    }
+
+    private String resign() {
+        webSocket.sendResign();
+        return "You resigned the game.";
     }
 
     @Override
     public void handleLoadGame(LoadGameMessage message) {
-
+        this.currentGame = message.getGame();
+        String board = PrintBoard.render(currentGame.getBoard(), perspective);
+        System.out.println("Board updated: \nCHESS BOARD\n"+ board);
     }
 
     @Override
     public void handleNotification(NotificationMessage message) {
-
+        System.out.println(message.getMessage());
     }
 
     @Override
     public void handleError(ErrorMessage message) {
+        System.out.println("ERROR: " + message.getErrorMessage());
+    }
 
+    private ChessPosition parsePosition(String s) {
+        if (s == null || s.length() != 2) {
+            throw new IllegalArgumentException("Bad square: " + s);
+        }
+        char file = Character.toLowerCase(s.charAt(0));
+        char rank = s.charAt(1);
+        int col = file - 'a' + 1;
+        int row = rank - '0';
+        return new ChessPosition(row, col);
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public int getGameID() {
+        return gameID;
     }
 }
