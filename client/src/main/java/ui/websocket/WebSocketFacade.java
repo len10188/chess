@@ -3,6 +3,7 @@ package ui.websocket;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
+
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -11,7 +12,6 @@ import websocket.messages.ServerMessage;
 
 import java.awt.*;
 import java.net.URI;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class WebSocketFacade {
@@ -41,10 +41,37 @@ public class WebSocketFacade {
         this.onError = onError;
 
         String webSocketUrl = serverUrl.replaceFirst("^http", "ws") + "/connect";
+        System.out.println("Connecting to WebSocker URL: " + webSocketUrl);
 
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        container.connectToServer(this, URI.create(webSocketUrl));
+        this.session = container.connectToServer(this, new URI(webSocketUrl));
 
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            @Override
+            public void onMessage(String json) {
+                handleIncoming(json);
+            }
+        });
+
+    }
+
+    private void handleIncoming(String json) {
+        ServerMessage base = gson.fromJson(json, ServerMessage.class);
+
+        switch (base.getServerMessageType()) {
+            case LOAD_GAME -> {
+                LoadGameMessage msg = gson.fromJson(json, LoadGameMessage.class);
+                onLoadGame.accept(msg);
+            }
+            case NOTIFICATION -> {
+                NotificationMessage msg = gson.fromJson(json, NotificationMessage.class);
+                onNotification.accept(msg);
+            }
+            case ERROR -> {
+                ErrorMessage msg = gson.fromJson(json, ErrorMessage.class);
+                onError.accept(msg);
+            }
+        }
     }
 
     // HANDLE EVENTS
@@ -55,26 +82,6 @@ public class WebSocketFacade {
 
          // connect automatically
         sendConnect();
-     }
-
-     @OnMessage
-    public void onMessage(String json) {
-         ServerMessage base = gson.fromJson(json, ServerMessage.class);
-
-         switch (base.getServerMessageType()) {
-             case LOAD_GAME -> {
-                 LoadGameMessage msg = gson.fromJson(json, LoadGameMessage.class);
-                 onLoadGame.accept(msg);
-             }
-             case NOTIFICATION -> {
-                 NotificationMessage msg = gson.fromJson(json, NotificationMessage.class);
-                 onNotification.accept(msg);
-             }
-             case ERROR -> {
-                 ErrorMessage msg = gson.fromJson(json, ErrorMessage.class);
-                 onError.accept(msg);
-             }
-         }
      }
 
      @OnClose
