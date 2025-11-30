@@ -12,12 +12,16 @@ public class ChessGame {
 
     private TeamColor currentTurn;
     private ChessBoard board;
+    private  boolean gameOver;
+
+
 
     public ChessGame() {
         board = new ChessBoard(); // make a board
         board.resetBoard(); // set up a new board
         currentTurn = TeamColor.WHITE; // game starts on White team
-        }
+        gameOver = false;
+    }
 
     /**
      * @return Which team's turn it is
@@ -255,6 +259,13 @@ public class ChessGame {
             }
         }
         return true; // there ARE moves
+    }
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean value) {
+        gameOver = value;
     }
 
     @Override

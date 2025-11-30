@@ -63,7 +63,7 @@ public class Server {
 
         // WebSocket routes
         WebSocketHandler webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
-        javalin.ws("/connect", wsConfig -> {
+        javalin.ws("/ws", wsConfig -> {
             wsConfig.onConnect(webSocketHandler);
             wsConfig.onMessage(webSocketHandler);
             wsConfig.onClose(webSocketHandler);

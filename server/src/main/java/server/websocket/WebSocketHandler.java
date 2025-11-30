@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -51,7 +52,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             UserGameCommand command = gson.fromJson(wsMessageContext.message(), UserGameCommand.class);
             if (command == null || command.getCommandType() == null){
-                sendError(wsMessageContext.session , "Invalid command");
+                sendError(wsMessageContext.session , "Error: Invalid command");
                 return;
             }
 
@@ -75,21 +76,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         Integer gameID = command.getGameID();
 
         if (authToken == null || gameID == null){
-            sendError(session, "Missing authToken or gameID for CONNECT");
+            sendError(session, "Error: Missing authToken or gameID for CONNECT");
             session.close();
             return;
         }
 
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
-            sendError(session, "Unauthorized");
+            sendError(session, "Error: Unauthorized");
             session.close();
             return;
         }
 
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
-            sendError(session,"Game not found");
+            sendError(session,"Error: Game not found");
             session.close();
             return;
         }
@@ -102,9 +103,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String loadJson = gson.toJson(loadMsg);
         session.getRemote().sendString(loadJson);
 
-        NotificationMessage note = new NotificationMessage(
-                auth.username() + " joined game " + gameID
-        );
+        String username = auth.username();
+        String noteText;
+
+        if (username.equals(gameData.whiteUsername())){
+            noteText = username + " joined as white";
+        } else if (username.equals(gameData.blackUsername())){
+            noteText = username + " joined as black";
+        } else {
+            noteText = username + " joined as an observer";
+        }
+        NotificationMessage note = new NotificationMessage(noteText);
         String noteJson = gson.toJson(note);
         connections.broadcast(gameID, session, noteJson);
 
@@ -114,28 +123,53 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         String authToken = command.getAuthToken();
         Integer gameID = command.getGameID();
-
         if (authToken == null || gameID == null) {
-            sendError(session, "Missing authtoken or gameID for MAKE_MOVE");
+            sendError(session, "Error: Missing authToken or gameID for MAKE_MOVE");
             return;
         }
 
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
-            sendError(session, "Unauthorized");
+            sendError(session, "Error: Unauthorized");
+            return;
+        }
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData.isOver()) {
+            sendError(session, "Error: Game is already over");
+            return;
+        }
+        if (gameData == null) {
+            sendError(session, "Error: Game not found");
+            return;
+        }
+
+        String username = auth.username();
+        String white = gameData.whiteUsername();
+        String black = gameData.blackUsername();
+
+        ChessGame.TeamColor currentTurn = gameData.game().getTeamTurn();
+
+        // Check the user is player
+        if (!username.equals(white) && !username.equals(black)) {
+            sendError(session, "Error: Observers cannot make moves. Please leave and join a new game to play.");
+        }
+
+        // Check if players turn.
+        if (currentTurn == ChessGame.TeamColor.WHITE && !username.equals(white)) {
+            sendError(session, "Error: It is white's turn");
+            return;
+        }
+        if (currentTurn == ChessGame.TeamColor.BLACK && !username.equals(black)) {
+            sendError(session, "Error: It is black's turn");
             return;
         }
 
         if (command.getMove() == null) {
-            sendError(session, "No move provided");
+            sendError(session, "Error: No move provided");
             return;
         }
 
-        GameData gameData = gameDAO.getGame(gameID);
-        if (gameData == null) {
-            sendError(session, "Game not found");
-            return;
-        }
+
 
         ChessGame game = gameData.game();
 
@@ -151,15 +185,34 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String loadJson = gson.toJson(loadMsg);
             connections.broadcast(gameID, null, loadJson);
 
+
+            ChessGame.TeamColor movedColor = currentTurn;
+            ChessGame.TeamColor opponent;
+            if (movedColor == ChessGame.TeamColor.WHITE){
+                opponent = ChessGame.TeamColor.BLACK;
+            } else {
+                opponent = ChessGame.TeamColor.WHITE;
+            }
+
+            StringBuilder extraNote = new StringBuilder();
+
+            if (game.isInCheckmate(opponent)) {
+                extraNote.append(" Checkmate! ");
+            } else if (game.isInStalemate(opponent)) {
+                extraNote.append(" Stalemate. ");
+            } else if (game.isInCheck(opponent)){
+                extraNote.append(" ").append(opponent == ChessGame.TeamColor.WHITE ? "White" : "Black").append(" is in check.");
+            }
+
             // broadcast move notification
             NotificationMessage note = new NotificationMessage(
-                    auth.username() + " played " + command.getMove()
+                    username + " played " + command.getMove() + extraNote
             );
             String noteJson = gson.toJson(note);
             connections.broadcast(gameID, null, noteJson);
 
         } catch (Exception e) {
-            sendError(session, "Move failed: " + e.getMessage());
+            sendError(session, "Error: Move failed: " + e.getMessage());
         }
     }
 
@@ -167,23 +220,40 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String authToken = command.getAuthToken();
         Integer gameID = command.getGameID();
 
-        if (gameID == null) {
+        if (authToken == null || gameID == null) {
+            sendError(session, "Error: Missing authToken or gameID for LEAVE");
+            session.close();
+            return;
+        }
+        AuthData auth = authDAO.getAuth(authToken);
+        if (auth == null) {
+            sendError(session, "Error: Unauthorized");
             session.close();
             return;
         }
 
-        AuthData auth = null;
-        if (authToken != null) {
-            auth = authDAO.getAuth(authToken);
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) {
+            sendError(session, "Error: Game not found");
+            session.close();
+            return;
         }
 
-        if (auth != null) {
-            NotificationMessage note = new NotificationMessage(
-                    auth.username() + "left game " + gameID
-            );
-            String noteJson = gson.toJson(note);
-            connections.broadcast(gameID, session, noteJson);
+        String username = auth.username();
+
+        // if player, clear from DB
+        if (username.equals(gameData.whiteUsername())){
+            gameDAO.updateGamePlayers(gameID, "white", null);
+        } else if (username.equals(gameData.blackUsername())){
+            gameDAO.updateGamePlayers(gameID, "black", null);
         }
+
+        NotificationMessage note = new NotificationMessage(
+                auth.username() + "left game " + gameID
+        );
+        String noteJson = gson.toJson(note);
+        connections.broadcast(gameID, session, noteJson);
+
 
         connections.remove(gameID, session);
         session.close();
@@ -194,19 +264,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         Integer gameID = command.getGameID();
 
         if (authToken == null || gameID == null) {
-            sendError(session, "Missing authToken or gameID for RESIGN");
+            sendError(session, "Error: Missing authToken or gameID for RESIGN");
             return;
         }
 
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
-            sendError(session, "Unauthorized");
+            sendError(session, "Error: Unauthorized");
             return;
         }
 
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
-            sendError(session, "Game not found");
+            sendError(session, "Error: Game not found");
             return;
         }
 

@@ -14,7 +14,7 @@ import java.awt.*;
 import java.net.URI;
 import java.util.function.Consumer;
 
-public class WebSocketFacade {
+public class WebSocketFacade extends Endpoint{
     private final Gson gson = new Gson();
 
     private Session session;
@@ -40,7 +40,7 @@ public class WebSocketFacade {
         this.onNotification = onNotification;
         this.onError = onError;
 
-        String webSocketUrl = serverUrl.replaceFirst("^http", "ws") + "/connect";
+        String webSocketUrl = serverUrl.replaceFirst("^http", "ws") + "/ws";
         System.out.println("Connecting to WebSocker URL: " + webSocketUrl);
 
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -48,57 +48,48 @@ public class WebSocketFacade {
 
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
-            public void onMessage(String json) {
-                handleIncoming(json);
+            public void onMessage(String message) {
+                handleIncoming(message);
             }
         });
+    }
 
+    @Override
+    public void onOpen(Session session,EndpointConfig config) {
+        System.out.println("WebSocket connected.");
+        this.session = session;
+        sendConnect();
     }
 
     private void handleIncoming(String json) {
-        ServerMessage base = gson.fromJson(json, ServerMessage.class);
+        try {
+            ServerMessage base = gson.fromJson(json, ServerMessage.class);
 
-        switch (base.getServerMessageType()) {
-            case LOAD_GAME -> {
-                LoadGameMessage msg = gson.fromJson(json, LoadGameMessage.class);
-                onLoadGame.accept(msg);
+            switch (base.getServerMessageType()) {
+                case LOAD_GAME -> {
+                    LoadGameMessage msg = gson.fromJson(json, LoadGameMessage.class);
+                    onLoadGame.accept(msg);
+                }
+                case NOTIFICATION -> {
+                    NotificationMessage msg = gson.fromJson(json, NotificationMessage.class);
+                    onNotification.accept(msg);
+                }
+                case ERROR -> {
+                    ErrorMessage msg = gson.fromJson(json, ErrorMessage.class);
+                    onError.accept(msg);
+                }
             }
-            case NOTIFICATION -> {
-                NotificationMessage msg = gson.fromJson(json, NotificationMessage.class);
-                onNotification.accept(msg);
-            }
-            case ERROR -> {
-                ErrorMessage msg = gson.fromJson(json, ErrorMessage.class);
-                onError.accept(msg);
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
-    // HANDLE EVENTS
-     @OnOpen
-    public void onOpen(Session session) {
-        this.session = session;
-        System.out.println("WebSocket connected.");
-
-         // connect automatically
-        sendConnect();
-     }
-
-     @OnClose
-    public void onClose(Session session, CloseReason reason) {
-        System.out.println("WebSocket closed: " + reason);
-        this.session = null;
-     }
-
-     @OnError
-    public void onError(Session session, Throwable throwable) {
-        System.out.println("WebSocket error: " + throwable.getMessage());
-     }
 
      // SEND COMMANDS
     private void sendRaw(String json) {
         if (session != null && session.isOpen()) {
             session.getAsyncRemote().sendText(json);
+        } else {
+            System.out.println("WebSocket session is not open; cannot send: " + json);
         }
     }
 
