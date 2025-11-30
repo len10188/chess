@@ -4,6 +4,7 @@ package server;
 import dataaccess.*;
 import handler.*;
 
+import server.websocket.WebSocketHandler;
 import service.*;
 
 import io.javalin.*;
@@ -51,7 +52,7 @@ public class Server {
         JoinGameHandler joinGameHandler = new JoinGameHandler(joinGameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
 
-        // routes
+        // HTTP routes
         javalin.post("/user", userHandler.registerUser);
         javalin.post("/session", loginHandler.loginUser);
         javalin.delete("/session", logoutHandler.logoutUser);
@@ -59,6 +60,15 @@ public class Server {
         javalin.post("/game", createGameHandler.createGame);
         javalin.put("/game", joinGameHandler.joinGame);
         javalin.delete("/db", clearHandler.clearAll);
+
+        // WebSocket routes
+        WebSocketHandler webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
+        javalin.ws("/connect", wsConfig -> {
+            wsConfig.onConnect(webSocketHandler);
+            wsConfig.onMessage(webSocketHandler);
+            wsConfig.onClose(webSocketHandler);
+            wsConfig.onError(webSocketHandler);
+        });
 
     }
 

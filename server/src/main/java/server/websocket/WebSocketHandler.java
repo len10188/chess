@@ -17,7 +17,7 @@ import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
 
-public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
+public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler, WsErrorHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
     private final AuthDAO authDAO;
@@ -38,6 +38,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleConnect(@NotNull WsConnectContext wsConnectContext) throws Exception {
         System.out.println("WebSocket connected");
         wsConnectContext.enableAutomaticPings();
+    }
+
+    @Override
+    public void handleError(WsErrorContext ctx) {
+        System.out.println("WebSocket error occurred");
+        if (ctx.error() != null) ctx.error().printStackTrace();
     }
 
     @Override
