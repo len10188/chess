@@ -6,8 +6,6 @@ import java.util.Scanner;
 import chess.ChessGame;
 import model.GameData;
 
-import static java.lang.Integer.parseInt;
-
 public class ReadEvalLoop implements MessageHandler {
     private final String serverUrl;
     private final PreLoginClient preLogin;
@@ -63,6 +61,7 @@ public class ReadEvalLoop implements MessageHandler {
 
     private void runPostLogin(Scanner scanner, String authToken) {
         PostLoginClient postLogin = new PostLoginClient(serverUrl, this, authToken);
+        InGameClient inGame = null;
 
         System.out.println(postLogin.welcome());
         System.out.println(postLogin.help());
@@ -118,14 +117,14 @@ public class ReadEvalLoop implements MessageHandler {
                         }
 
                         ChessGame.TeamColor perspective;
-                        if (color.equalsIgnoreCase("white") {
+                        if ("white".equalsIgnoreCase(color)) {
                             perspective = ChessGame.TeamColor.WHITE;
                         } else {
                             perspective = ChessGame.TeamColor.BLACK;
                         }
 
                         try {
-                            InGameClient inGame = new InGameClient(serverUrl, authToken, game.gameID(), perspective);
+                            inGame = new InGameClient(serverUrl, authToken, game.gameID(), perspective);
                             state = UiState.IN_GAME;
                             System.out.println("Joined game as " + color + ".");
                             System.out.println(inGame.help());
@@ -152,7 +151,7 @@ public class ReadEvalLoop implements MessageHandler {
                         GameData game = games.get(gameNum - 1);
 
                         try {
-                            ui.InGameClient inGame  = new InGameClient(serverUrl,
+                            inGame  = new InGameClient(serverUrl,
                                     authToken,
                                     game.gameID(),
                                     ChessGame.TeamColor.WHITE);
@@ -183,11 +182,18 @@ public class ReadEvalLoop implements MessageHandler {
 
                     // everything else
                     System.out.println(out);
-                } else if (state = UiState.IN_GAME) {
-                    String out = inGame.eval(line)
+                } else if (state == UiState.IN_GAME) {
+                    String out = inGame.eval(line);
+                    if (out != null && !out.isBlank()) {
+                        System.out.println(out);
+                    }
+
+                    if (out != null && out.startsWith("Leaving game.")) {
+                        state = UiState.LOGGED_IN;
+                        inGame = null;
+                        System.out.println(postLogin.help());
+                    }
                 }
-
-
             }catch(Throwable t){
                 System.out.println("Error: " + t.getClass().getSimpleName());
             }
@@ -210,6 +216,13 @@ public class ReadEvalLoop implements MessageHandler {
             return scanner.nextLine();
         } catch (Exception e) {
             return null; //  EOF or closed.
+        }
+    }
+    private int parseInt(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 }
