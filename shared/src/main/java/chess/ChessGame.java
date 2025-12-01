@@ -12,7 +12,7 @@ public class ChessGame {
 
     private TeamColor currentTurn;
     private ChessBoard board;
-    private  boolean gameOver;
+    private  boolean gameOver = false;
 
 
 
@@ -20,7 +20,6 @@ public class ChessGame {
         board = new ChessBoard(); // make a board
         board.resetBoard(); // set up a new board
         currentTurn = TeamColor.WHITE; // game starts on White team
-        gameOver = false;
     }
 
     /**
@@ -86,6 +85,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (gameOver) {
+            throw new InvalidMoveException("Game is over");
+        }
+
         ChessPiece piece = board.getPiece((move.getStartPosition()));
 
         if(piece == null || piece.getTeamColor() != currentTurn){
@@ -265,7 +268,7 @@ public class ChessGame {
     }
 
     public void setGameOver(boolean value) {
-        gameOver = value;
+        this.gameOver = value;
     }
 
     @Override

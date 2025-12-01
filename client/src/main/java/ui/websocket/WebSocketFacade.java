@@ -41,7 +41,7 @@ public class WebSocketFacade extends Endpoint{
         this.onError = onError;
 
         String webSocketUrl = serverUrl.replaceFirst("^http", "ws") + "/ws";
-        System.out.println("Connecting to WebSocker URL: " + webSocketUrl);
+        //System.out.println("Connecting to WebSocker URL: " + webSocketUrl);
 
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, new URI(webSocketUrl));
@@ -56,14 +56,19 @@ public class WebSocketFacade extends Endpoint{
 
     @Override
     public void onOpen(Session session,EndpointConfig config) {
-        System.out.println("WebSocket connected.");
+        //System.out.println("WebSocket connected.");
         this.session = session;
+        this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleIncoming);
         sendConnect();
     }
 
     private void handleIncoming(String json) {
         try {
             ServerMessage base = gson.fromJson(json, ServerMessage.class);
+            if (base == null || base.getServerMessageType() == null) {
+                System.out.println("Unknown server message: " + json);
+                return;
+            }
 
             switch (base.getServerMessageType()) {
                 case LOAD_GAME -> {

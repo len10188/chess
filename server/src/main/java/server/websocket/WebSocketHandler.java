@@ -134,14 +134,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
         GameData gameData = gameDAO.getGame(gameID);
-        if (gameData.isOver()) {
-            sendError(session, "Error: Game is already over");
-            return;
-        }
         if (gameData == null) {
             sendError(session, "Error: Game not found");
             return;
         }
+        if (gameData.game().isGameOver()) {
+            sendError(session, "Error: Game is already over");
+            return;
+        }
+
 
         String username = auth.username();
         String white = gameData.whiteUsername();
@@ -152,6 +153,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         // Check the user is player
         if (!username.equals(white) && !username.equals(black)) {
             sendError(session, "Error: Observers cannot make moves. Please leave and join a new game to play.");
+            return;
         }
 
         // Check if players turn.
@@ -174,16 +176,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         ChessGame game = gameData.game();
 
         try{
-            // make move
-            game.makeMove(command.getMove());
 
-            // update gameboard
-            gameDAO.updateGame(gameID, game);
-
-            // broadcast update to everyone
-            LoadGameMessage loadMsg = new LoadGameMessage(game);
-            String loadJson = gson.toJson(loadMsg);
-            connections.broadcast(gameID, null, loadJson);
 
 
             ChessGame.TeamColor movedColor = currentTurn;
@@ -197,12 +190,25 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             StringBuilder extraNote = new StringBuilder();
 
             if (game.isInCheckmate(opponent)) {
+                game.setGameOver(true);
                 extraNote.append(" Checkmate! ");
             } else if (game.isInStalemate(opponent)) {
+                game.setGameOver(true);
                 extraNote.append(" Stalemate. ");
             } else if (game.isInCheck(opponent)){
                 extraNote.append(" ").append(opponent == ChessGame.TeamColor.WHITE ? "White" : "Black").append(" is in check.");
             }
+
+            // make move
+            game.makeMove(command.getMove());
+
+            // update gameboard
+            gameDAO.updateGame(gameID, game);
+
+            // broadcast update to everyone
+            LoadGameMessage loadMsg = new LoadGameMessage(game);
+            String loadJson = gson.toJson(loadMsg);
+            connections.broadcast(gameID, null, loadJson);
 
             // broadcast move notification
             NotificationMessage note = new NotificationMessage(
@@ -249,7 +255,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
 
         NotificationMessage note = new NotificationMessage(
-                auth.username() + "left game " + gameID
+                auth.username() + " left game " + gameID
         );
         String noteJson = gson.toJson(note);
         connections.broadcast(gameID, session, noteJson);
@@ -262,6 +268,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void resign(UserGameCommand command, Session session) throws IOException, DataAccessException {
         String authToken = command.getAuthToken();
         Integer gameID = command.getGameID();
+
 
         if (authToken == null || gameID == null) {
             sendError(session, "Error: Missing authToken or gameID for RESIGN");
@@ -280,10 +287,23 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
+
+
+        // set game over flag
+        ChessGame game = gameData.game();
+        if (game.isGameOver()) {
+            sendError(session, "Error: Game is already over");
+            return;
+        }
+
+        game.setGameOver(true);
+        gameDAO.updateGame(gameID, game); // update the game with new status.
+
         // Notify everyone in the game
         NotificationMessage note = new NotificationMessage(
                 auth.username() + " resigned from game " + gameID
         );
+
         String noteJson = gson.toJson(note);
         connections.broadcast(gameID, null, noteJson);
 

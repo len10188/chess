@@ -121,9 +121,9 @@ public class InGameClient implements ServerMessageHandler {
 
             webSocket.sendMove(move);
             if (promotionPiece == null) {
-                return "Move made: " + from + " -> "+ to;
+                return "Attempting move: " + from + " -> "+ to;
             } else {
-                return "Move made: " + from + " -> "+ to + "promoting to " + promotionPiece;
+                return "Attempting move: " + from + " -> "+ to + "promoting to " + promotionPiece;
             }
         } catch (IllegalArgumentException e) {
             return "Invalid square given. Example: a1, e7, etc.";
@@ -144,7 +144,7 @@ public class InGameClient implements ServerMessageHandler {
     public void handleLoadGame(LoadGameMessage message) {
         this.currentGame = message.getGame();
         String board = PrintBoard.render(currentGame.getBoard(), perspective);
-        System.out.println("Board updated: \nCHESS BOARD\n"+ board);
+        System.out.println("                CHESS BOARD\n"+ board);
     }
 
     @Override
