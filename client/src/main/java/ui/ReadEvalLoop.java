@@ -13,6 +13,8 @@ public class ReadEvalLoop implements MessageHandler {
     private enum UiState {LOGGED_OUT, LOGGED_IN, IN_GAME}
     private UiState state = UiState.LOGGED_OUT;
 
+    private InGameClient inGame;
+
 
     public ReadEvalLoop(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -61,7 +63,6 @@ public class ReadEvalLoop implements MessageHandler {
 
     private void runPostLogin(Scanner scanner, String authToken) {
         PostLoginClient postLogin = new PostLoginClient(serverUrl, this, authToken);
-        InGameClient inGame = null;
 
         System.out.println(postLogin.welcome());
         System.out.println(postLogin.help());

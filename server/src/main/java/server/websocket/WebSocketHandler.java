@@ -43,7 +43,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleError(WsErrorContext ctx) {
         System.out.println("WebSocket error occurred");
-        if (ctx.error() != null) ctx.error().printStackTrace();
+        if (ctx.error() != null) {
+            ctx.error().printStackTrace();
+        }
     }
 
     @Override
@@ -147,7 +149,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-
         String username = auth.username();
         String white = gameData.whiteUsername();
         String black = gameData.blackUsername();
@@ -175,12 +176,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-
-
         ChessGame game = gameData.game();
 
         try{
-
             // make move
             game.makeMove(command.getMove());
 
@@ -203,9 +201,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             } else if (game.isInCheck(opponent)){
                 extraNote.append(" ").append(opponent == ChessGame.TeamColor.WHITE ? "White" : "Black").append(" is in check.");
             }
-
-
-
             // update gameboard
             gameDAO.updateGame(gameID, game);
 
@@ -257,7 +252,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } else if (username.equals(gameData.blackUsername())){
             gameDAO.updateGamePlayers(gameID, "black", null);
         }
-
         NotificationMessage note = new NotificationMessage(
                 auth.username() + " left game " + gameID
         );
@@ -315,14 +309,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         String noteJson = gson.toJson(note);
         connections.broadcast(gameID, null, noteJson);
-
-        // send final board status
-        /*
-        LoadGameMessage loadMsg = new LoadGameMessage(gameData.game());
-        String loadJson = gson.toJson(loadMsg);
-        connections.broadcast(gameID, session, loadJson);
-
-         */
     }
 
 
