@@ -182,5 +182,74 @@ public class ReadEvalLoop implements MessageHandler {
         }
     }
 
+    private void handlePostLoginEval(String line, PostLoginClient postLogin) {
+        String out = postLogin.eval(line);
+        if (out == null || out.isBlank()) {
+            return;
+        }
 
+        if ("goodbye".equals(out)) {
+            System.out.println("Logged out.");
+            state = UiState.LOGGED_OUT;
+            return;
+        }
+
+        if (out.startsWith("BOARD")) {
+            System.out.println(out.substring("BOARD\n".length()));
+            return;
+        }
+
+        System.out.println(out);
+    }
+
+    private void handleWatchCommand(String[] parts, PostLoginClient postLogin, String authToken) {
+        if (parts.length != 2) {
+            System.out.println("Usage: watch <gameNumber>");
+            return;
+        }
+
+        int gameNum = parseInt(parts[1]);
+        List<GameData> games = postLogin.getLastListedGames();
+        if (gameNum < 1 || gameNum > games.size()) {
+            System.out.println("Invalid game number. Use 'list' to see games.");
+            return;
+        }
+
+        GameData game = games.get(gameNum - 1);
+
+        try {
+            inGame = new InGameClient(
+                    serverUrl,
+                    authToken,
+                    game.gameID(),
+                    ChessGame.TeamColor.WHITE   // observers see from white perspective
+            );
+            state = UiState.IN_GAME;
+            System.out.println("Observing game.");
+            System.out.println(inGame.help());
+        } catch (Exception e) {
+            System.out.println("Failed to observe game: " + e.getMessage());
+        }
+    }
+
+
+    private void handleInGameLine(String line, PostLoginClient postLogin) {
+        if (inGame == null) {
+            System.out.println("Error: Not currently in a game.");
+            state = UiState.LOGGED_IN;
+            return;
+        }
+
+        String out = inGame.eval(line);
+        if (out != null && !out.isBlank()) {
+            System.out.println(out);
+        }
+
+        if (out != null && out.startsWith("Leaving game.")) {
+            state = UiState.LOGGED_IN;
+            inGame = null;
+            System.out.println(postLogin.help());
+        }
+
+    }
 }
