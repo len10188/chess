@@ -17,11 +17,13 @@ public class PreLoginClient {
 
     public String help() {
         return """
+        --------Help Menu--------
         Options:
-         Register a new user: 'r', 'register' <USERNAME> <PASSWORD> <EMAIL>
-         Login as an existing user: 'l', 'login' <USERNAME> <PASSWORD>
-         Exit the program: 'q', 'quit'
-         Print this message: 'h', 'help'
+          Register a new user: 'r', 'register' <USERNAME> <PASSWORD> <EMAIL>
+          Login as an existing user: 'l', 'login' <USERNAME> <PASSWORD>
+          Exit the program: 'q', 'quit'
+          Print this message: 'h', 'help'
+        -------------------------
         """;
     }
 

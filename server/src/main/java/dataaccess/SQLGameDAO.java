@@ -133,8 +133,10 @@ public class SQLGameDAO implements GameDAO {
                     throw new DataAccessException("Game not found");
                 }
                 var existingPlayer = resultSet.getString(column);
-                if (existingPlayer != null) {
-                    throw new DataAccessException("Player color already taken");
+                if (username != null) {
+                    if (existingPlayer != null) {
+                        throw new DataAccessException("Player color already taken");
+                    }
                 }
             }
 

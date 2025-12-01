@@ -37,16 +37,21 @@ public class InGameClient implements ServerMessageHandler {
                 this::handleError
         );
     }
+    public String welcome() {
+        return "\n♕♕♕ You are now playing chess! ♕♕♕\n";
+    }
 
     public String help() {
         return """
+        --------Help Menu--------
         Options:
-        Show this message: 'h', 'help'
-        Redraw the board: 'redraw'
-        Make a move (example: 'move e2 e4'): 'm', 'move' <from> <to>
-        Promotion (example: 'move e7 e8 q'): 'm', 'move' <from> <to> <q|r|b|n>
-        Leave game and return to lobby: 'l', 'leave'
-        Resign the game: 'resign'
+          Show this message: 'h', 'help'
+          Redraw the board: 'redraw'
+          Make a move (example: 'move e2 e4'): 'm', 'move' <from> <to>
+          Promotion (example: 'move e7 e8 q'): 'm', 'move' <from> <to> <q|r|b|n>
+          Leave game and return to lobby: 'l', 'leave'
+          Resign the game: 'resign'
+        -------------------------
         """;
     }
 
@@ -94,7 +99,7 @@ public class InGameClient implements ServerMessageHandler {
             return "No game state yet. Waiting for server...";
         }
         String board = PrintBoard.render(currentGame.getBoard(), perspective);
-        return "CHESS BOARD\n" + board;
+        return "            CHESS BOARD\n" + board;
     }
 
     private String makeMove(String from, String to, String promotionName) {

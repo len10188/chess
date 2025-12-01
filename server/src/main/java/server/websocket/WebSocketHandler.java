@@ -214,12 +214,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String loadJson = gson.toJson(loadMsg);
             connections.broadcast(gameID, null, loadJson);
 
-            // broadcast move notification
+            // broadcast move notification to everyone else.
             NotificationMessage note = new NotificationMessage(
                     username + " played " + command.getMove() + extraNote
             );
             String noteJson = gson.toJson(note);
-            connections.broadcast(gameID, null, noteJson);
+            connections.broadcast(gameID, session, noteJson);
 
         } catch (Exception e) {
             sendError(session, "Move failed: " + e.getMessage());
@@ -291,7 +291,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-
+        String username = auth.username();
+        // Check the user is player
+        if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
+            sendError(session, "Observers cannot resign. Type 'leave' if you wish to return to the lobby.");
+            return;
+        }
 
         // set game over flag
         ChessGame game = gameData.game();
@@ -312,9 +317,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcast(gameID, null, noteJson);
 
         // send final board status
+        /*
         LoadGameMessage loadMsg = new LoadGameMessage(gameData.game());
         String loadJson = gson.toJson(loadMsg);
-        connections.broadcast(gameID, null, loadJson);
+        connections.broadcast(gameID, session, loadJson);
+
+         */
     }
 
 

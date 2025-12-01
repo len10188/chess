@@ -22,12 +22,14 @@ public class PostLoginClient {
 
     public String help() {
         return """
+        --------Help Menu--------
         Options:
-        List current games: 'l', 'list'
-        Create a new game: 'c', 'create' <GAME NAME>
-        Join a game: 'j', 'join', <GAME ID> <WHITE|BLACK>
-        Watch a game: 'w', 'watch' <GAME ID>
-        Logout: 'logout'
+          List current games: 'l', 'list'
+          Create a new game: 'c', 'create' <GAME NAME>
+          Join a game: 'j', 'join', <GAME ID> <WHITE|BLACK>
+          Watch a game: 'w', 'watch' <GAME ID>
+          Logout: 'logout'
+        -------------------------
         """;
     }
 

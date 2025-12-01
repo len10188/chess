@@ -127,6 +127,7 @@ public class ReadEvalLoop implements MessageHandler {
                             inGame = new InGameClient(serverUrl, authToken, game.gameID(), perspective);
                             state = UiState.IN_GAME;
                             System.out.println("Joined game as " + color + ".");
+                            System.out.println(inGame.welcome());
                             System.out.println(inGame.help());
                         } catch (Exception e) {
                             System.out.println("Failed to enter game: " + e.getMessage());
