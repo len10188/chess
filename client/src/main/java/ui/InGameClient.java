@@ -142,14 +142,15 @@ public class InGameClient implements ServerMessageHandler {
 
     @Override
     public void handleLoadGame(LoadGameMessage message) {
+        //System.out.println("handleLoadGame fired! in InGameClient");
         this.currentGame = message.getGame();
         String board = PrintBoard.render(currentGame.getBoard(), perspective);
-        System.out.println("                CHESS BOARD\n"+ board);
+        System.out.println("            CHESS BOARD\n"+ board);
     }
 
     @Override
     public void handleNotification(NotificationMessage message) {
-        System.out.println(message.getMessage());
+        //System.out.println(message.getMessage());
     }
 
     @Override

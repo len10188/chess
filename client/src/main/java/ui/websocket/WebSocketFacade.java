@@ -14,7 +14,9 @@ import java.awt.*;
 import java.net.URI;
 import java.util.function.Consumer;
 
+
 public class WebSocketFacade extends Endpoint{
+
     private final Gson gson = new Gson();
 
     private Session session;
@@ -40,20 +42,26 @@ public class WebSocketFacade extends Endpoint{
         this.onNotification = onNotification;
         this.onError = onError;
 
-        String webSocketUrl = serverUrl.replaceFirst("^http", "ws") + "/ws";
+        String webSocketUrl = serverUrl.replace("http", "ws");
+        URI socketURI = new URI(webSocketUrl + "/ws");
         //System.out.println("Connecting to WebSocker URL: " + webSocketUrl);
 
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        this.session = container.connectToServer(this, new URI(webSocketUrl));
+        this.session = container.connectToServer(this, socketURI);
 
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            @Override
+            public void onMessage (String message) {
+                handleIncoming(message);
+            }
+        });
+
+        sendConnect();
     }
 
     @Override
     public void onOpen(Session session,EndpointConfig config) {
         //System.out.println("WebSocket connected.");
-        this.session = session;
-        this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleIncoming);
-        sendConnect();
     }
 
     private void handleIncoming(String json) {
@@ -79,6 +87,7 @@ public class WebSocketFacade extends Endpoint{
                 }
             }
         } catch (Exception e) {
+            System.out.println("Exception in handleIncoming:");
             e.printStackTrace();
         }
     }
@@ -86,6 +95,7 @@ public class WebSocketFacade extends Endpoint{
      // SEND COMMANDS
     private void sendRaw(String json) {
         if (session != null && session.isOpen()) {
+            //System.out.println("Client sending WS message: " + json);
             session.getAsyncRemote().sendText(json);
         } else {
             System.out.println("WebSocket session is not open; cannot send: " + json);

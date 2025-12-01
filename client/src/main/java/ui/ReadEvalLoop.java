@@ -208,7 +208,10 @@ public class ReadEvalLoop implements MessageHandler {
             case IN_GAME -> tag = "[IN GAME]";
             default -> tag =  "[ERROR IN GAME STATE]";
         }
-        System.out.println(tag +" >>> ");
+
+        if (state == UiState.LOGGED_IN || state == UiState.LOGGED_OUT) {
+            System.out.println(tag + " >>> ");
+        }
     }
 
     private String readLine(Scanner scanner) {

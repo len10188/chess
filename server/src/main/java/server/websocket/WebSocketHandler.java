@@ -49,11 +49,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleMessage(@NotNull WsMessageContext wsMessageContext) throws Exception {
         try {
+            //System.out.println("WS received raw: " + wsMessageContext.message());
             UserGameCommand command = gson.fromJson(wsMessageContext.message(), UserGameCommand.class);
             if (command == null || command.getCommandType() == null){
-                sendError(wsMessageContext.session , "Error: Invalid command");
+                sendError(wsMessageContext.session , "Invalid command");
                 return;
             }
+
+            //System.out.println("Parsed WS command: "+ command.getCommandType());
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command, wsMessageContext.session);
@@ -71,25 +74,26 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void connect(UserGameCommand command, Session session) throws IOException, DataAccessException {
+        //System.out.println("Handling CONNECT for gameID=" + command.getGameID());
         String authToken = command.getAuthToken();
         Integer gameID = command.getGameID();
 
         if (authToken == null || gameID == null){
-            sendError(session, "Error: Missing authToken or gameID for CONNECT");
+            sendError(session, "Missing authToken or gameID for CONNECT");
             session.close();
             return;
         }
 
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
-            sendError(session, "Error: Unauthorized");
+            sendError(session, "Unauthorized");
             session.close();
             return;
         }
 
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
-            sendError(session,"Error: Game not found");
+            sendError(session,"Game not found");
             session.close();
             return;
         }
@@ -100,6 +104,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         //send game state to client
         LoadGameMessage loadMsg = new LoadGameMessage(gameData.game());
         String loadJson = gson.toJson(loadMsg);
+        //System.out.println("Sending LOAD_GAME JSON: " + loadJson);
         session.getRemote().sendString(loadJson);
 
         String username = auth.username();
@@ -123,22 +128,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String authToken = command.getAuthToken();
         Integer gameID = command.getGameID();
         if (authToken == null || gameID == null) {
-            sendError(session, "Error: Missing authToken or gameID for MAKE_MOVE");
+            sendError(session, "Missing authToken or gameID for MAKE_MOVE");
             return;
         }
 
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
-            sendError(session, "Error: Unauthorized");
+            sendError(session, "Unauthorized");
             return;
         }
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
-            sendError(session, "Error: Game not found");
+            sendError(session, "Game not found");
             return;
         }
         if (gameData.game().isGameOver()) {
-            sendError(session, "Error: Game is already over");
+            sendError(session, "Game is already over");
             return;
         }
 
@@ -151,22 +156,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         // Check the user is player
         if (!username.equals(white) && !username.equals(black)) {
-            sendError(session, "Error: Observers cannot make moves. Please leave and join a new game to play.");
+            sendError(session, "Observers cannot make moves. Please leave and join a new game to play.");
             return;
         }
 
         // Check if players turn.
         if (currentTurn == ChessGame.TeamColor.WHITE && !username.equals(white)) {
-            sendError(session, "Error: It is white's turn");
+            sendError(session, "It is white's turn");
             return;
         }
         if (currentTurn == ChessGame.TeamColor.BLACK && !username.equals(black)) {
-            sendError(session, "Error: It is black's turn");
+            sendError(session, "It is black's turn");
             return;
         }
 
         if (command.getMove() == null) {
-            sendError(session, "Error: No move provided");
+            sendError(session, "No move provided");
             return;
         }
 
@@ -176,7 +181,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         try{
 
-
+            // make move
+            game.makeMove(command.getMove());
 
             ChessGame.TeamColor movedColor = currentTurn;
             ChessGame.TeamColor opponent;
@@ -198,8 +204,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 extraNote.append(" ").append(opponent == ChessGame.TeamColor.WHITE ? "White" : "Black").append(" is in check.");
             }
 
-            // make move
-            game.makeMove(command.getMove());
+
 
             // update gameboard
             gameDAO.updateGame(gameID, game);
@@ -217,7 +222,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcast(gameID, null, noteJson);
 
         } catch (Exception e) {
-            sendError(session, "Error: Move failed: " + e.getMessage());
+            sendError(session, "Move failed: " + e.getMessage());
         }
     }
 
@@ -226,20 +231,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         Integer gameID = command.getGameID();
 
         if (authToken == null || gameID == null) {
-            sendError(session, "Error: Missing authToken or gameID for LEAVE");
+            sendError(session, "Missing authToken or gameID for LEAVE");
             session.close();
             return;
         }
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
-            sendError(session, "Error: Unauthorized");
+            sendError(session, "Unauthorized");
             session.close();
             return;
         }
 
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
-            sendError(session, "Error: Game not found");
+            sendError(session, "Game not found");
             session.close();
             return;
         }
@@ -270,19 +275,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
 
         if (authToken == null || gameID == null) {
-            sendError(session, "Error: Missing authToken or gameID for RESIGN");
+            sendError(session, "Missing authToken or gameID for RESIGN");
             return;
         }
 
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
-            sendError(session, "Error: Unauthorized");
+            sendError(session, "Unauthorized");
             return;
         }
 
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
-            sendError(session, "Error: Game not found");
+            sendError(session, "Game not found");
             return;
         }
 
@@ -291,7 +296,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         // set game over flag
         ChessGame game = gameData.game();
         if (game.isGameOver()) {
-            sendError(session, "Error: Game is already over");
+            sendError(session, "Game is already over");
             return;
         }
 
