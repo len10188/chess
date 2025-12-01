@@ -85,6 +85,7 @@ public class ReadEvalLoop implements MessageHandler {
             }
         }
     }
+
     private void printPrompt() {
         String tag;
         switch(state){
@@ -250,6 +251,5 @@ public class ReadEvalLoop implements MessageHandler {
             inGame = null;
             System.out.println(postLogin.help());
         }
-
     }
 }
