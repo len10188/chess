@@ -210,8 +210,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcast(gameID, null, loadJson);
 
             // broadcast move notification to everyone else.
+            String moveText = formatMove(command.getMove());
             NotificationMessage note = new NotificationMessage(
-                    username + " played " + command.getMove() + extraNote
+                    username + " played " + moveText + extraNote
             );
             String noteJson = gson.toJson(note);
             connections.broadcast(gameID, session, noteJson);
@@ -311,8 +312,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
 
         // Notify everyone in the game
+        String fullMessage = String.format(
+                "GAME OVER: %s resigned from game %d. %s",
+                username, gameID, winnerText
+        );
         NotificationMessage note = new NotificationMessage(
-                "Game over: " + username + " resigned from game " + gameID + "." + winnerText
+                "Game over: " + username + " resigned from game " + gameID + ".\n" + winnerText
         );
 
         String noteJson = gson.toJson(note);
@@ -325,6 +330,32 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String json = gson.toJson(err);
         if (session != null && session.isOpen()) {
             session.getRemote().sendString(json);
+        }
+    }
+    private String formatSquare(chess.ChessPosition pos) {
+        int col = pos.getColumn();
+        int row = pos.getRow();
+
+        char file = (char) ('a' + (col - 1));
+        return "" + file + row;
+    }
+
+    private String formatMove(chess.ChessMove move) {
+        String from = formatSquare(move.getStartPosition());
+        String to = formatSquare(move.getEndPosition());
+
+        if (move.getPromotionPiece() != null) {
+
+            char promoChar = switch (move.getPromotionPiece()) {
+                case QUEEN  -> 'q';
+                case ROOK   -> 'r';
+                case BISHOP -> 'b';
+                case KNIGHT -> 'n';
+                default     -> '?';
+            };
+            return from + " to " + to + " promoting to " + promoChar;
+        } else {
+            return from + " to " + to;
         }
     }
 }
