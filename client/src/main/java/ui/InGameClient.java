@@ -47,6 +47,7 @@ public class InGameClient implements ServerMessageHandler {
         Options:
           Show this message: 'h', 'help'
           Redraw the board: 'redraw'
+          Highlight legal moves (example: 'highlight e2'): 'hl', 'highlight' <square>
           Make a move (example: 'move e2 e4'): 'm', 'move' <from> <to>
           Promotion (example: 'move e7 e8 q'): 'm', 'move' <from> <to> <q|r|b|n>
           Leave game and return to lobby: 'l', 'leave'
@@ -66,6 +67,12 @@ public class InGameClient implements ServerMessageHandler {
         return switch (cmd) {
             case "help", "h" -> help();
             case "redraw", "r" -> redraw();
+            case "highlight", "hl" -> {
+                if (parts.length != 2) {
+                    yield "Usage: highlight <square>";
+                }
+                yield highlightMoves(parts[1]);
+            }
             case "move", "m" -> {
                 if (parts.length < 3) {
                     yield "Too few arguments.\nUsage: move <from> <to> [q|r|b|n]";
@@ -180,5 +187,32 @@ public class InGameClient implements ServerMessageHandler {
 
     public int getGameID() {
         return gameID;
+    }
+
+    private String highlightMoves(String from) {
+        if (currentGame == null) {
+            return "No game loaded yet.";
+        }
+
+        try {
+            ChessPosition start = parsePosition(from);
+
+            ChessPiece piece = currentGame.getBoard().getPiece(start);
+            if (piece == null) {
+                return "No piece at " + from.toLowerCase() + ".";
+            }
+
+            var legalMoves = currentGame.validMoves(start);
+
+            if (legalMoves == null || legalMoves.isEmpty()){
+                String board = PrintBoard.renderHighlighted(currentGame.getBoard(), perspective, start, legalMoves);
+                return "No legal moves for " + from.toLowerCase() + ".\n" + board;
+            }
+
+            String board = PrintBoard.renderHighlighted(currentGame.getBoard(), perspective, start, legalMoves);
+            return "Legal moves for " + from.toLowerCase() +":\n" + board;
+        } catch (IllegalArgumentException e ) {
+            return "Invalid square given. Example: a1, e7, etc.";
+        }
     }
 }
