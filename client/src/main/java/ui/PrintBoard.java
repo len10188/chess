@@ -1,9 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.BLACK_BISHOP;
@@ -112,4 +113,68 @@ public class PrintBoard {
             default:     return EMPTY;
         }
     }
+
+    public static String renderHighlighted(ChessBoard board, ChessGame.TeamColor perspective, ChessPosition selected, Collection<ChessMove> legalMoves) {
+        Set<ChessPosition> targets = new HashSet<>();
+        if (legalMoves != null) {
+            for (ChessMove move : legalMoves) {
+                targets.add(move.getEndPosition());
+            }
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        int[] rankOrder;
+        int[] fileOrder;
+        if (perspective == ChessGame.TeamColor.WHITE){
+            rankOrder = new int[]{7,6,5,4,3,2,1,0};
+            fileOrder = new int[]{0,1,2,3,4,5,6,7};
+        }else { // Black
+            rankOrder = new int[]{0,1,2,3,4,5,6,7};
+            fileOrder = new int[]{7,6,5,4,3,2,1,0};
+        }
+
+        stringBuilder.append(filesHeader(perspective)).append("\n");
+
+        for (int rank : rankOrder) {
+            int rankNumber = rank + 1;
+
+            // left rank label
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ")
+                    .append(rankNumber)
+                    .append(" ").append(QUARTER_SPACE).append(LITTLE_SPACE)
+                    .append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+
+            for (int file : fileOrder) {
+                ChessPosition pos = new ChessPosition(rankNumber, file + 1);
+
+                boolean lightSquare = ((file + rankNumber) % 2 == 0);
+                String bg = lightSquare ? SET_BG_COLOR_LIGHT_LIGHT_GREY : SET_BG_COLOR_LIGHT_GREY;
+
+                // highlight background if selected / target
+                if (selected != null && pos.equals(selected)) {
+                    // pick whatever highlight color you like from EscapeSequences
+                    bg = SET_BG_COLOR_GREEN; // <-- adjust if your EscapeSequences uses a different name
+                } else if (targets.contains(pos)) {
+                    bg = SET_BG_COLOR_YELLOW; // <-- adjust name as needed
+                }
+
+                ChessPiece piece = board.getPiece(pos);
+                String glyph = (piece == null) ? EMPTY : pieceToGlyph(piece);
+
+                stringBuilder.append(bg).append(SET_TEXT_COLOR_BLACK).append(glyph)
+                        .append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+            }
+
+            // right rank label
+            stringBuilder.append(SET_BG_COLOR_NAVY_BLUE).append(SET_TEXT_COLOR_WHITE).append(" ")
+                    .append(QUARTER_SPACE).append(rankNumber)
+                    .append(" ").append(LITTLE_SPACE).append(LITTLE_SPACE)
+                    .append(RESET_TEXT_COLOR).append(RESET_BG_COLOR).append('\n');
+        }
+
+        stringBuilder.append(filesHeader(perspective)).append('\n');
+        return stringBuilder.toString();
+    }
+
 }
