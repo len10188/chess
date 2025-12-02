@@ -192,14 +192,50 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             StringBuilder extraNote = new StringBuilder();
 
+            String oppositeUser;
+            if (username.equals(gameData.whiteUsername())){
+                oppositeUser = gameData.blackUsername();
+            } else {
+                oppositeUser = gameData.whiteUsername();
+            }
+
             if (game.isInCheckmate(opponent)) {
                 game.setGameOver(true);
-                extraNote.append("\nGAME OVER: Checkmate! \n").append(username).append(" WINS!");
+                extraNote.append("\nGAME OVER: ").append(oppositeUser).append(" is in checkmate! ").append(username).append(" WINS!");
+                // broadcast move notification to everyone else.
+                String moveText = formatMove(command.getMove());
+                NotificationMessage note = new NotificationMessage(
+                        username + " played " + moveText + extraNote
+                );
+                String noteJson = gson.toJson(note);
+                connections.broadcast(gameID, null, noteJson);
+                return;
+
+
             } else if (game.isInStalemate(opponent)) {
                 game.setGameOver(true);
                 extraNote.append("\nGAME OVER: Stalemate. ");
+
+                // broadcast move notification to everyone else.
+                String moveText = formatMove(command.getMove());
+                NotificationMessage note = new NotificationMessage(
+                        username + " played " + moveText + extraNote
+                );
+                String noteJson = gson.toJson(note);
+                connections.broadcast(gameID, null, noteJson);
+                return;
+
             } else if (game.isInCheck(opponent)){
-                extraNote.append(" ").append(opponent == ChessGame.TeamColor.WHITE ? "White" : "Black").append(" is in check.");
+                extraNote.append(". ").append(oppositeUser).append(" is in check.");
+
+                // broadcast move notification to everyone else.
+                String moveText = formatMove(command.getMove());
+                NotificationMessage note = new NotificationMessage(
+                        username + " played " + moveText + extraNote
+                );
+                String noteJson = gson.toJson(note);
+                connections.broadcast(gameID, null, noteJson);
+                return;
             }
             // update gameboard
             gameDAO.updateGame(gameID, game);
@@ -359,3 +395,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 }
+
+// both players recieve checkmate notification, include username of who is in checkmate.
+// check should send to both.
+
+// error index out of bounds.

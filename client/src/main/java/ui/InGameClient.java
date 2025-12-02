@@ -192,10 +192,29 @@ public class InGameClient implements ServerMessageHandler {
         if (s == null || s.length() != 2) {
             throw new IllegalArgumentException("Bad square: " + s);
         }
-        char file = Character.toLowerCase(s.charAt(0));
+        s = s.trim().toLowerCase();
+
+        // must be exactly two chars
+        if (s.length() != 2) {
+            throw new IllegalArgumentException("Invalid square: " + s + ". Use like e2.");
+        }
+
+        char file = s.charAt(0);
         char rank = s.charAt(1);
+
+        // file must be a–h
+        if (file < 'a' || file > 'h') {
+            throw new IllegalArgumentException("Invalid file: " + s + ". Use a–h.");
+        }
+
+        // rank must be 1–8
+        if (rank < '1' || rank > '8') {
+            throw new IllegalArgumentException("Invalid rank: " + s + ". Use 1–8.");
+        }
+
         int col = file - 'a' + 1;
         int row = rank - '0';
+
         return new ChessPosition(row, col);
     }
 
