@@ -140,10 +140,10 @@ public class InGameClient implements ServerMessageHandler {
             ChessPiece.PieceType promotionPiece = null;
             if (promotionName != null){
                 promotionPiece = switch (promotionName.toLowerCase()) {
-                    case "q" -> ChessPiece.PieceType.QUEEN;
-                    case "r" -> ChessPiece.PieceType.ROOK;
-                    case "b" -> ChessPiece.PieceType.BISHOP;
-                    case "n" -> ChessPiece.PieceType.KNIGHT;
+                    case "q", "queen" -> ChessPiece.PieceType.QUEEN;
+                    case "r", "rook" -> ChessPiece.PieceType.ROOK;
+                    case "b", "bishop" -> ChessPiece.PieceType.BISHOP;
+                    case "n", "knight" -> ChessPiece.PieceType.KNIGHT;
                     default -> null;
                 };
             }
@@ -154,7 +154,7 @@ public class InGameClient implements ServerMessageHandler {
             if (promotionPiece == null) {
                 return "Attempting move: " + from + " -> "+ to;
             } else {
-                return "Attempting move: " + from + " -> "+ to + "promoting to " + promotionPiece;
+                return "Attempting move: " + from + " -> "+ to + " promoting to " + promotionPiece;
             }
         } catch (IllegalArgumentException e) {
             return "Invalid square given. Example: a1, e7, etc.";
