@@ -146,6 +146,11 @@ public class ReadEvalLoop implements MessageHandler {
         int gameNum = parseInt(parts[1]);
         String color = parts[2].toLowerCase();
 
+        if (!color.equals("white") && !color.equals("black")){
+            System.out.println("Invalid color. Choose 'white' or 'black'.");
+            return;
+        }
+
         List<GameData> games = postLogin.getLastListedGames();
         if (gameNum < 1 || gameNum > games.size()) {
             System.out.println("Invalid game number. Use 'list' to see games.");

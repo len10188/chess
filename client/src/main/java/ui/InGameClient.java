@@ -162,7 +162,7 @@ public class InGameClient implements ServerMessageHandler {
 
     @Override
     public void handleNotification(NotificationMessage message) {
-        //System.out.println(message.getMessage());
+        System.out.println(message.getMessage());
     }
 
     @Override
