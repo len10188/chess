@@ -114,7 +114,8 @@ public class PrintBoard {
         }
     }
 
-    public static String renderHighlighted(ChessBoard board, ChessGame.TeamColor perspective, ChessPosition selected, Collection<ChessMove> legalMoves) {
+    public static String renderHighlighted(ChessBoard board, ChessGame.TeamColor perspective,
+                                           ChessPosition selected, Collection<ChessMove> legalMoves) {
         Set<ChessPosition> targets = new HashSet<>();
         if (legalMoves != null) {
             for (ChessMove move : legalMoves) {
