@@ -194,10 +194,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             if (game.isInCheckmate(opponent)) {
                 game.setGameOver(true);
-                extraNote.append(" Checkmate! ");
+                extraNote.append("\nGAME OVER: Checkmate! \n").append(username).append(" WINS!");
             } else if (game.isInStalemate(opponent)) {
                 game.setGameOver(true);
-                extraNote.append(" Stalemate. ");
+                extraNote.append("\nGAME OVER: Stalemate. ");
             } else if (game.isInCheck(opponent)){
                 extraNote.append(" ").append(opponent == ChessGame.TeamColor.WHITE ? "White" : "Black").append(" is in check.");
             }
@@ -302,9 +302,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         game.setGameOver(true);
         gameDAO.updateGame(gameID, game); // update the game with new status.
 
+        // Establish winner
+        String winnerText = "";
+        if (username.equals(gameData.whiteUsername())) {
+            winnerText = "Black wins by resignation.";
+        } else {
+            winnerText = "White wins by resignation.";
+        }
+
         // Notify everyone in the game
         NotificationMessage note = new NotificationMessage(
-                auth.username() + " resigned from game " + gameID
+                "Game over: " + username + " resigned from game " + gameID + "." + winnerText
         );
 
         String noteJson = gson.toJson(note);

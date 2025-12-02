@@ -14,6 +14,7 @@ public class InGameClient implements ServerMessageHandler {
     private final String authToken;
     private final int gameID;
     private final ChessGame.TeamColor perspective;
+    private boolean waitingForResignConfirm = false;
 
     private ChessGame currentGame;
 
@@ -61,6 +62,23 @@ public class InGameClient implements ServerMessageHandler {
             return "";
         }
 
+        if (waitingForResignConfirm){
+            String answer = input.trim().toLowerCase();
+            waitingForResignConfirm = false; // reset to false
+
+            return switch (answer) {
+                case "y", "yes" -> {
+                    resign();
+                    yield "";
+                }
+                case "n", "no" -> "Resign canceled.";
+
+                default -> {
+                    yield "Please answer 'y' or 'n'. Resign Canceled";
+                }
+            };
+        }
+
         var parts = input.trim().split("\\s+");
         var cmd = parts[0].toLowerCase();
 
@@ -91,10 +109,11 @@ public class InGameClient implements ServerMessageHandler {
                 yield makeMove(from, to, promotionPiece);
             }
             case "leave", "l" -> leave();
-            case "resign" -> resign();
-            case "order66" -> {
-                yield "It will be done my lord.";
+            case "resign" -> {
+                waitingForResignConfirm = true;
+                yield "Are you sure you want to resign? (y/n)";
             }
+            case "order66" -> "It will be done my lord.";
             default ->  "Unknown command. Try 'help'.";
         };
     }
@@ -147,9 +166,8 @@ public class InGameClient implements ServerMessageHandler {
         return "Leaving game. Returning to lobby...";
     }
 
-    private String resign() {
+    private void resign() {
         webSocket.sendResign();
-        return "You resigned the game.";
     }
 
     @Override
